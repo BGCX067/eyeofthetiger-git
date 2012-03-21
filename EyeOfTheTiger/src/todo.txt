@@ -1,9 +1,9 @@
-- About: Afficher plus d'infos: site web ? Mail ?
-
-- tooltips: a la ligne pour les plus longs
-- Sauvegarde en dixieme de secondes
 
 
++ tooltips: a la ligne pour les plus longs
++ Sauvegarde en dixieme de secondes
++ About: Afficher plus d'infos: site web ? Mail ?
++ Boite d'import: redimensionement vertical
 + Course: agrandir un peu la fenètre: la partie droite: devrait ètre resizable en fait
 + Chrono: garder uniquement les dixièmes
 + Chrono: afficher les zeros

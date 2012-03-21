@@ -17,6 +17,7 @@ public class EyeOfTheTigerAboutBox extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         
+        jToggleButton1.requestFocus();
         jLabelVersion.setText(eyeofthetiger.gui.Utils.getVersionProperty("BUILDDATE") + "   (build #" +eyeofthetiger.gui.Utils.getVersionProperty("BUILD") +")");
     }
 
@@ -35,8 +36,10 @@ public class EyeOfTheTigerAboutBox extends javax.swing.JDialog {
         jLabel3 = new javax.swing.JLabel();
         jLabelVersion = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setResizable(false);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/eyeofthetiger/gui/resources/tiger.png"))); // NOI18N
 
@@ -55,6 +58,11 @@ public class EyeOfTheTigerAboutBox extends javax.swing.JDialog {
         jLabelVersion.setText("jLabel4");
 
         jLabel4.setText("Réalisé par Christophe JALADY");
+
+        jTextField1.setEditable(false);
+        jTextField1.setText("http://code.google.com/p/eyeofthetiger/");
+        jTextField1.setBorder(null);
+        jTextField1.setCaretPosition(0);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -75,7 +83,8 @@ public class EyeOfTheTigerAboutBox extends javax.swing.JDialog {
                                 .addComponent(jLabel1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel2))
-                            .addComponent(jLabel4))
+                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -86,7 +95,9 @@ public class EyeOfTheTigerAboutBox extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2)
                     .addComponent(jLabel1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -158,6 +169,7 @@ public class EyeOfTheTigerAboutBox extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabelVersion;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JToggleButton jToggleButton1;
     // End of variables declaration//GEN-END:variables
 }

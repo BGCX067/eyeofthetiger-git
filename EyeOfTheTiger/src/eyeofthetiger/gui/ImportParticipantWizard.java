@@ -42,6 +42,7 @@ public class ImportParticipantWizard extends javax.swing.JPanel {
         jLabelError.setVisible(false);
         jTableParticipant.setAutoCreateRowSorter(true);
         jScrollPaneTextMessage.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        jTextPane1.setCaretPosition(0);
         jTextFieldDelimiter.getDocument().addDocumentListener(new DocumentListener() {
 
             public void insertUpdate(DocumentEvent e) {
@@ -330,12 +331,12 @@ public class ImportParticipantWizard extends javax.swing.JPanel {
                         .addComponent(jButtonChooseFile))
                     .addGroup(jPanelInnerLayout.createSequentialGroup()
                         .addGroup(jPanelInnerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jCheckBoxFirstColumnIsNumber)
+                            .addComponent(jCheckBoxSkipFirstLine)
                             .addGroup(jPanelInnerLayout.createSequentialGroup()
                                 .addComponent(jLabel4)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextFieldDelimiter, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jCheckBoxFirstColumnIsNumber)
-                            .addComponent(jCheckBoxSkipFirstLine))
+                                .addComponent(jTextFieldDelimiter, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPaneTextMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)))
                 .addContainerGap())
@@ -354,13 +355,13 @@ public class ImportParticipantWizard extends javax.swing.JPanel {
                         .addComponent(jCheckBoxFirstColumnIsNumber)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jCheckBoxSkipFirstLine)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanelInnerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel4)
                             .addComponent(jTextFieldDelimiter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jScrollPaneTextMessage))
+                    .addComponent(jScrollPaneTextMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelInnerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jToggleButtonGenerateNumber)
