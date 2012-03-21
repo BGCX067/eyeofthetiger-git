@@ -1,0 +1,17 @@
+- About: Afficher plus d'infos: site web ? Mail ?
+
+- tooltips: a la ligne pour les plus longs
+- Sauvegarde en dixieme de secondes
+
+
++ Course: agrandir un peu la fenètre: la partie droite: devrait ètre resizable en fait
++ Chrono: garder uniquement les dixièmes
++ Chrono: afficher les zeros
++ Afficher le départ avec les secondes.
++ "Créer un course" dans le menu "Fichier"
++ Supprimer la course ne supprime pas l'onglet
++ Donner le focus sur la cours lors de sa création
++ Generer les dossards: 
+    + proposer un nom par defaut: si tout : nom du projet, sinon nom de la course;
+    + PDF par defaut
++ Virer le vb du chrono
