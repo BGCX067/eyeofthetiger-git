@@ -60,6 +60,21 @@ public class Participant {
         this.groupe = groupe;
         propertyChangeSupport.firePropertyChange(PROP_GROUPE, oldGroupe, groupe);
     }
+    
+    protected String renseignements = "";
+    public static final String PROP_RENSEIGNEMENTS = "renseignements";
+    public String getRenseignements() {
+        return renseignements;
+    }
+    public void setRenseignements(String renseignements) {
+        if(renseignements != null) {
+            renseignements = renseignements.replace(';', ' ').replace('\n', ' ').replace("\r","");
+        }
+        String oldRenseignements = this.renseignements;
+        this.renseignements = renseignements;
+        propertyChangeSupport.firePropertyChange(PROP_RENSEIGNEMENTS, oldRenseignements, renseignements);
+    }
+    
 
     protected DateTime dateInscription = new DateTime();
     public static final String PROP_DATEINSCRIPTION = "dateInscription";

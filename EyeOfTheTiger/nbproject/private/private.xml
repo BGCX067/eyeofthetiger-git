@@ -1,28 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1"/>
-    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/gui/ProjectView.java</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/gui/CourseView.java</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/gui/DialogCreateCourse.java</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/gui/ImportParticipantWizard.java</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/gui/ParticipantPanel.java</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/gui/MBAction.java</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/gui/ExportDossard.java</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/EyeOfTheTigerMainFrame.java</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/infos.html</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/gui/TestBarcodeFrame.java</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/gui/OkCancelDialog.java</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/DossardGeneration.java</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/model/Course.java</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/model/Project.java</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/gui/Utils.java</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/EyeOfTheTiger.java</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/build.xml</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/EyeOfTheTigerAboutBox.java</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/model/Participant.java</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/test/eyeofthetiger/model/ProjectTest.java</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/utils/DateToStringConverter.java</file>
-        <file>file:/E:/devel/Java/EyeOfTheTiger/src/eyeofthetiger/utils/Utils.java</file>
-    </open-files>
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
 </project-private>

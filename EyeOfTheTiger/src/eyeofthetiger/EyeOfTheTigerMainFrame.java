@@ -7,16 +7,24 @@ package eyeofthetiger;
 import com.jgoodies.looks.LookUtils;
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
 import eyeofthetiger.gui.DialogCreateNewProject;
+import eyeofthetiger.gui.DossardDesignPanel;
 import eyeofthetiger.gui.ExportDossard;
 import eyeofthetiger.gui.ProjectView;
 import eyeofthetiger.gui.TestBarcodeFrame;
+import eyeofthetiger.gui.Utils;
 import eyeofthetiger.model.Course;
+import eyeofthetiger.model.Participant;
 import eyeofthetiger.model.Project;
+import eyeofthetiger.utils.PDFDossardGenerator;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,12 +49,22 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
                 exitAskSave();
             }
         });
+
+        saveTimer = new Timer(2000, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                doSave(true);
+            }
+        });
+        saveTimer.start();         
         
         jTextPaneInfos.setContentType("text/html");
         jTextPaneInfos.setEditable(false);
         jTextPaneInfos.setText(InfoHTML());        
     }
 
+    
+    private Timer saveTimer = null;
+    
     
     public static String InfoHTML() {
         String html = new Scanner(EyeOfTheTiger.class.getResourceAsStream("/eyeofthetiger/infos.html"),"UTF-8").useDelimiter("\\A").next();
@@ -87,11 +105,13 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
         saveProjectMenuItem = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         jMenuItemNouvelleCourse = new javax.swing.JMenuItem();
+        jMenuEditCourse = new javax.swing.JMenu();
         jMenuDeleteCourse = new javax.swing.JMenu();
         jSeparator3 = new javax.swing.JPopupMenu.Separator();
         exitMenuItem = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
         jMenuItemTestCodeBar = new javax.swing.JMenuItem();
+        jMenuItemOptionsDossards = new javax.swing.JMenuItem();
         jMenuItemGenerateDossard = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         aboutMenuItem = new javax.swing.JMenuItem();
@@ -99,7 +119,7 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Eye of the Tiger");
 
-        jTextPaneInfos.setContentType("text/html");
+        jTextPaneInfos.setContentType("text/html"); // NOI18N
         jScrollPane1.setViewportView(jTextPaneInfos);
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/eyeofthetiger/gui/resources/archive_insert.png"))); // NOI18N
@@ -206,6 +226,9 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
         });
         fileMenu.add(jMenuItemNouvelleCourse);
 
+        jMenuEditCourse.setText("Modifier les participants");
+        fileMenu.add(jMenuEditCourse);
+
         jMenuDeleteCourse.setText("Supprimer la course ...");
         jMenuDeleteCourse.addMenuListener(new javax.swing.event.MenuListener() {
             public void menuCanceled(javax.swing.event.MenuEvent evt) {
@@ -249,6 +272,14 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
             }
         });
         helpMenu.add(jMenuItemTestCodeBar);
+
+        jMenuItemOptionsDossards.setText("Options des dossards");
+        jMenuItemOptionsDossards.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemOptionsDossardsActionPerformed(evt);
+            }
+        });
+        helpMenu.add(jMenuItemOptionsDossards);
 
         jMenuItemGenerateDossard.setText("Générer les dossards");
         jMenuItemGenerateDossard.addActionListener(new java.awt.event.ActionListener() {
@@ -299,7 +330,7 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
             }
 
             if(result == JOptionPane.OK_OPTION) {
-                doSave();
+                doSave(false);
             }
         }
         System.exit(0);
@@ -314,7 +345,7 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_loadProjectMenuItemActionPerformed
 
     private void saveProjectMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveProjectMenuItemActionPerformed
-        doSave();
+        doSave(false);
     }//GEN-LAST:event_saveProjectMenuItemActionPerformed
 
     private void jMenuItemGenerateDossardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGenerateDossardActionPerformed
@@ -355,9 +386,11 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
     private void helpMenuMenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_helpMenuMenuSelected
         if(currectProject == null) {
             jMenuItemGenerateDossard.setEnabled(false);
+            jMenuItemOptionsDossards.setEnabled(false);
         }
         else {
             jMenuItemGenerateDossard.setEnabled(true);
+            jMenuItemOptionsDossards.setEnabled(true);
         }
     }//GEN-LAST:event_helpMenuMenuSelected
 
@@ -377,6 +410,64 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jMenuItemNouvelleCourseActionPerformed
 
+    private void jMenuItemOptionsDossardsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemOptionsDossardsActionPerformed
+        if(currectProjectView != null) {
+            PDFDossardGenerator pdfGenertor = new PDFDossardGenerator();
+            pdfGenertor.setExportName(true);
+            pdfGenertor.setExportGroup(true);
+            pdfGenertor.setExportRenseignement(true);
+            pdfGenertor.setExportLogos(true);
+            pdfGenertor.setMarginCm(currectProject.getOptions().getMarginCm());
+            pdfGenertor.setLogoLeft(new File(currectProject.getPath(),currectProject.getOptions().getLogoLeft()).getAbsolutePath());
+            pdfGenertor.setLogoRight(new File(currectProject.getPath(),currectProject.getOptions().getLogoRight()).getAbsolutePath());
+            pdfGenertor.setLogoLeftWidth(currectProject.getOptions().getLogoLeftWidth());
+            pdfGenertor.setLogoRightWidth(currectProject.getOptions().getLogoRightWidth());
+            DossardDesignPanel ddp = new DossardDesignPanel();
+            ddp.setPDFDossardGenerator(pdfGenertor);
+            ddp.setParticipants(new LinkedList<Participant>(currectProject.getParticipants()));
+            if(Utils.ShowOkCancelDialog(this, "Options des dossards", ddp,new Dimension(640, 480))) {
+                currectProject.getOptions().setMarginCm(pdfGenertor.getMarginCm());
+                currectProject.getOptions().setLogoLeftWidth(pdfGenertor.getLogoLeftWidth());
+                currectProject.getOptions().setLogoRightWidth(pdfGenertor.getLogoRightWidht());
+                try {
+                    File oldFile;
+                    File newFile;
+                    oldFile = new File(currectProject.getPath(),currectProject.getOptions().getLogoLeft());
+                    newFile = new File(pdfGenertor.getLogoLeft());
+                    if(!oldFile.equals(newFile)) {
+                        if(newFile.exists() && newFile.isFile()) {
+                            File copyNewFile = new File(currectProject.getPath(),newFile.getName());
+                            eyeofthetiger.utils.Utils.CopyFile(newFile, copyNewFile);
+                            currectProject.getOptions().setLogoLeft(copyNewFile.getName());
+                        }
+                        else {
+                            currectProject.getOptions().setLogoLeft("");
+                        }
+                        
+                    }
+                    oldFile = new File(currectProject.getPath(),currectProject.getOptions().getLogoRight());
+                    newFile = new File(pdfGenertor.getLogoRight());
+                    if(!oldFile.equals(newFile)) {
+                        if(newFile.exists() && newFile.isFile()) {
+                            File copyNewFile = new File(currectProject.getPath(),newFile.getName());
+                            eyeofthetiger.utils.Utils.CopyFile(newFile, copyNewFile);
+                            currectProject.getOptions().setLogoRight(copyNewFile.getName());
+                        }
+                        else {
+                            currectProject.getOptions().setLogoRight("");
+                        }
+                    }
+                    
+                    currectProject.saveOptions();
+                }
+                catch(Exception e) {
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Impossible de sauvegarder les options: " +e.getMessage());
+                }
+            }
+        }
+    }//GEN-LAST:event_jMenuItemOptionsDossardsActionPerformed
+
  
     private void newProject() {
         DialogCreateNewProject dlg = new DialogCreateNewProject(this, true);
@@ -395,10 +486,12 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
             @Override
             public boolean accept(File f) {
                 if(f.isDirectory()) {
+                    return true;
+                    /* TODO: this hide everything !!
                     File participants = new File(f, Project.PROJECT_PARTICIPANT_CSV_FILE);
                     if(participants.exists()) {
                         return true;
-                    }
+                    }*/
                 }
                 return false;
             }
@@ -409,7 +502,7 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
         });
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
         //fileChooser.setCurrentDirectory(new File("E:\\devel\\EyeOfTheTigerApp\\Projets"));
-
+        fileChooser.setDialogTitle("Choisissez le répertoire d'un projet");
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         if(fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File folder = fileChooser.getSelectedFile();
@@ -435,6 +528,8 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
  
 private void manageCourseMenuItems() {
     jMenuDeleteCourse.removeAll();
+    jMenuEditCourse.removeAll();
+    
     
     if(currectProject == null) {
         jMenuItemNouvelleCourse.setEnabled(false);
@@ -445,8 +540,9 @@ private void manageCourseMenuItems() {
     
     if(currectProject != null && currectProject.getCourse().size() >0) {
         jMenuDeleteCourse.setEnabled(true);
+        jMenuEditCourse.setEnabled(true);
         for(final Course c : currectProject.getCourse()) {
-            JMenuItem item = new JMenuItem(new AbstractAction(c.getName()) {
+            JMenuItem itemDelete = new JMenuItem(new AbstractAction(c.getName()) {
                     public void actionPerformed(ActionEvent e) {
                         try {
                             currectProject.deleteCourse(c);
@@ -459,11 +555,26 @@ private void manageCourseMenuItems() {
                         }
                     }
                 });
-            jMenuDeleteCourse.insert(item, 0);
+            jMenuDeleteCourse.insert(itemDelete, 0);
+            
+            JMenuItem itemEdit = new JMenuItem(new AbstractAction(c.getName()) {
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            if(currectProjectView != null) {
+                                currectProjectView.editCourse(c);
+                            }
+                        }
+                        catch(Exception ex) {
+                            JOptionPane.showMessageDialog(EyeOfTheTigerMainFrame.this,"Erreur lors de la modification de la course '" + c.getName() + "': " +ex.getMessage() ,"Erreur",JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                });
+            jMenuEditCourse.insert(itemEdit, 0);            
         }
     }
     else {
         jMenuDeleteCourse.setEnabled(false);
+        jMenuEditCourse.setEnabled(false);
     }
 }    
    
@@ -515,7 +626,18 @@ private void manageCourseMenuItems() {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
-                new EyeOfTheTigerMainFrame().setVisible(true);
+                EyeOfTheTigerMainFrame eottmf = new EyeOfTheTigerMainFrame();
+                boolean debug = false;
+                if(debug) {
+                    try {
+                        Project p = Project.LoadFrom(new File("e:\\tmp\\cross01"));
+                        eottmf.setCurrentProject(p);
+                    }
+                    catch(Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                eottmf.setVisible(true);
             }
         });
     }
@@ -528,8 +650,10 @@ private void manageCourseMenuItems() {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JMenu jMenuDeleteCourse;
+    private javax.swing.JMenu jMenuEditCourse;
     private javax.swing.JMenuItem jMenuItemGenerateDossard;
     private javax.swing.JMenuItem jMenuItemNouvelleCourse;
+    private javax.swing.JMenuItem jMenuItemOptionsDossards;
     private javax.swing.JMenuItem jMenuItemTestCodeBar;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
@@ -548,8 +672,18 @@ private void manageCourseMenuItems() {
 
 
 
-
-
+    private JLabel quietErrorLabel;
+    
+    private void setQuietErrorMessage(String msg) {
+        if(msg == null || msg.isEmpty()) {
+            quietErrorLabel.setVisible(false);
+        }
+        else {
+            quietErrorLabel.setText(msg);
+            quietErrorLabel.setVisible(true);
+        }
+    }
+    
 
 
     private ProjectView currectProjectView = null;
@@ -561,34 +695,62 @@ private void manageCourseMenuItems() {
         this.mainPanel.setLayout(new BorderLayout());        
         currectProjectView = new ProjectView(p);
         this.mainPanel.add(currectProjectView,BorderLayout.CENTER);
+        
+        
+        quietErrorLabel = new JLabel();
+        quietErrorLabel.setOpaque(true);
+        quietErrorLabel.setBackground(Color.red.brighter());
+        quietErrorLabel.setVisible(false);
+        this.mainPanel.add(quietErrorLabel,BorderLayout.NORTH);
+        
         this.mainPanel.updateUI();
+        
+        if(currectProject != null) {
+            this.setTitle("Eye of the Tiger - " + currectProject.getName() + "  ( " + currectProject.getPath() + " )");
+        }
     }
 
     
-    
-    private void doSave() {
+             
+    private void doSave(boolean quiet) {
         if(currectProject == null) {
             return;
         }
-        
+
+        saveTimer.stop();
+
         if(currectProject.isDirty()) {
             try {
                 currectProject.save();
+                setQuietErrorMessage(null);
             }
             catch(Exception e) {
-                JOptionPane.showMessageDialog(null,"Impossible d'enregistrer le projet: " + e.getMessage());
+                if(quiet) {
+                    setQuietErrorMessage("Impossible d'enregistrer le projet: " + e.getMessage());
+                }
+                else {
+                    JOptionPane.showMessageDialog(null,"Impossible d'enregistrer le projet: " + e.getMessage());
+                }
             }
         }
         for(Course c : currectProject.getCourse()) {
             if(c.isDirty()) {
                 try {
                     c.save(); 
+                    setQuietErrorMessage(null);
                 }
                 catch(Exception e) {
-                    JOptionPane.showMessageDialog(null,"Impossible d'enregistrer la course '" + c.getName() + "' :" + e.getMessage());
+                    if(quiet) {
+                        setQuietErrorMessage("Impossible d'enregistrer la course '" + c.getName() + "' :" + e.getMessage());   
+                    }
+                    else {                    
+                        JOptionPane.showMessageDialog(null,"Impossible d'enregistrer la course '" + c.getName() + "' :" + e.getMessage());
+                    }
                 }
             }
         }
+        
+        saveTimer.restart();
     }
 
 

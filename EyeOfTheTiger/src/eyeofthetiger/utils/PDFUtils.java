@@ -5,6 +5,7 @@
 package eyeofthetiger.utils;
 
 import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
@@ -12,6 +13,7 @@ import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.Barcode;
 import com.itextpdf.text.pdf.Barcode128;
@@ -24,40 +26,46 @@ import com.itextpdf.text.pdf.BarcodeInter25;
 import com.itextpdf.text.pdf.BarcodePDF417;
 import com.itextpdf.text.pdf.BarcodePostnet;
 import com.itextpdf.text.pdf.BarcodeQRCode;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import eyeofthetiger.model.Participant;
+import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import org.jpedal.PdfDecoder;
 import org.jpedal.examples.simpleviewer.SimpleViewer;
+import org.jpedal.exception.PdfException;
+import org.jpedal.fonts.FontMappings;
 
 /**
  *
  * @author christophe
  */
 public class PDFUtils {
-    
+   
     /*
     public static void test() {
         try {
             String fileName = "c:\\TEMP\\fdfz.pdf";
             createPdf(fileName);
-            //OpenViewer(fileName);   
+            //OpenViewer(fileName);  
         }
         catch(Exception e) {
             e.printStackTrace();
         }
     }*/
-    
+   
     public static void OpenViewer(String fileName) {
         SimpleViewer sv = new SimpleViewer(fileName);
         sv.setupViewer();
     }
-    
+   
 public static void createPdf(String filename) throws IOException, DocumentException {
         // step 1
         Document document = new Document(new Rectangle(340, 842));
@@ -69,7 +77,7 @@ public static void createPdf(String filename) throws IOException, DocumentExcept
         PdfContentByte cb = writer.getDirectContent();
  
         String code = "2846510";
-        
+       
         // EAN 13
         document.add(new Paragraph("Barcode EAN.UCC-13"));
         BarcodeEAN codeEAN = new BarcodeEAN();
@@ -87,7 +95,7 @@ public static void createPdf(String filename) throws IOException, DocumentExcept
         document.add(codeEAN.createImageWithBarcode(cb, null, null));
         codeEAN.setBaseline(codeEAN.getSize());
 
-                
+               
         // UPC A
         document.add(new Paragraph("Barcode UCC-12 (UPC-A)"));
         codeEAN.setCodeType(Barcode.UPCA);
@@ -95,7 +103,7 @@ public static void createPdf(String filename) throws IOException, DocumentExcept
         codeEAN.setCode(code);
         document.add(codeEAN.createImageWithBarcode(cb, null, null));
 
-        
+       
         // EAN 8
         document.add(new Paragraph("Barcode EAN.UCC-8"));
         codeEAN.setCodeType(Barcode.EAN8);
@@ -103,8 +111,8 @@ public static void createPdf(String filename) throws IOException, DocumentExcept
         //codeEAN.setCode("34569870");
         codeEAN.setCode(code);
         document.add(codeEAN.createImageWithBarcode(cb, null, null));
-        
-        
+       
+       
         // UPC E
         document.add(new Paragraph("Barcode UPC-E"));
         codeEAN.setCodeType(Barcode.UPCE);
@@ -112,7 +120,7 @@ public static void createPdf(String filename) throws IOException, DocumentExcept
         codeEAN.setCode(code);
         document.add(codeEAN.createImageWithBarcode(cb, null, null));
         codeEAN.setBarHeight(codeEAN.getSize() * 3f);
-        
+       
 
         // EANSUPP
         document.add(new Paragraph("Bookland"));
@@ -129,7 +137,7 @@ public static void createPdf(String filename) throws IOException, DocumentExcept
         BarcodeEANSUPP eanSupp = new BarcodeEANSUPP(codeEAN, codeSUPP);
         document.add(eanSupp.createImageWithBarcode(cb, null, BaseColor.BLUE));
         */
-        
+       
         // CODE 128
         document.add(new Paragraph("Barcode 128"));
         Barcode128 code128 = new Barcode128();
@@ -250,116 +258,237 @@ public static void createPdf(String filename) throws IOException, DocumentExcept
         // step 5
         document.close();
     }    
+   
+
+
+
+
     
-    /*
-   public static void createPdf(String filename) throws IOException, DocumentException {
-        Document document = new Document(PageSize.A4.rotate());
-        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(filename));
-        document.open();
-        PdfContentByte cb = writer.getDirectContent();
-
-        PdfPTable table = new PdfPTable(1);
-        table.setExtendLastRow(true);
+    private static Paragraph createCleanParagraph(String txt1, float fontSize1, boolean bold1) {
+        Phrase phrase = new Phrase(txt1);
+        phrase.getFont().setSize(fontSize1);
+        if(bold1) {
+            phrase.getFont().setStyle(Font.BOLD);
+            phrase.setLeading(fontSize1);  
+        }
+        Paragraph paragraph = new Paragraph(phrase);
         
-        float nameFontSize = 65f;
-        float groupFontSize = 45f;
-        float groupBottomMarginSize = 45f;
+        paragraph.setLeading(fontSize1);
+        paragraph.setSpacingBefore(0);
+        paragraph.setSpacingAfter(0);
+        paragraph.setExtraParagraphSpace(0);
+        paragraph.setFirstLineIndent(0);
+        paragraph.setIndentationLeft(0);
+        paragraph.setIndentationRight(0);
+        paragraph.setAlignment(Rectangle.ALIGN_CENTER);
         
-        PdfPCell cell;
-        
-        cell = new PdfPCell();
-        cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-        cell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
-        
-        Paragraph p;
-        p = new Paragraph("Jean de la voij Dupond");
-        p.setAlignment(Paragraph.ALIGN_CENTER);
-        p.getFont().setSize(nameFontSize);
-        p.getFont().setStyle(Font.BOLD);
-        cell.addElement(p);
-        
-        p = new Paragraph("Groupe 1");
-        p.setAlignment(Paragraph.ALIGN_CENTER);
-        p.getFont().setSize(groupFontSize);
-        cell.addElement(p);
-
-        p.setSpacingAfter(groupBottomMarginSize);
-
-        String code = "4512345678906";
-        BarcodeEAN codeEAN = new BarcodeEAN();
-        codeEAN.setCode(code);
-        Image barcodeImage = codeEAN.createImageWithBarcode(cb, null, null);
+        return paragraph;
+    }
+    
+    
+    private static Element createCleanBarcode(PdfContentByte cb,String numero, float width,float height) {
+        Barcode128 code128 = new Barcode128();
+        code128.setCode(numero);
+        Image barcodeImage = code128.createImageWithBarcode(cb, null, null);
         barcodeImage.setAlignment(Image.ALIGN_CENTER);
-        barcodeImage.setWidthPercentage(50f);
-        cell.addElement(barcodeImage);
-        
-        table.addCell(cell);
-        
-        document.add(table);        
-        
-        document.close();
-    }    
-   */
-   
-   
-    public static void createPdf(List<Participant> participants, boolean exportName, boolean exportGroup, OutputStream out) throws IOException, DocumentException {
+        //barcodeImage.setWidthPercentage(75f);
+        barcodeImage.scaleToFit(width, height);
+        return barcodeImage;        
+    }
+    
+    
+
+    public static void createPdf2(List<Participant> participants, boolean exportName, boolean exportGroup, boolean exportRenseignement, OutputStream out) throws IOException, DocumentException {
         Document document = new Document(PageSize.A4.rotate());
+        //document.setMargins(0,0,0,0);
         PdfWriter writer = PdfWriter.getInstance(document, out);
         document.open();
         PdfContentByte cb = writer.getDirectContent();
+        
+        float documentTop = document.top();
+        float documentBottom = document.bottom();
+        float documentHeight = documentTop - documentBottom;
+        float left = document.left();
+        float right = document.right();
+        float width = right - left;
+        
+        cb.rectangle(left, documentBottom, width, documentHeight);
+        cb.stroke();
+        
+        float nameHeightPercent = 0.35f;
+        float groupHeightPercent = 0.25f; 
 
-        float nameFontSize = 65f;
-        float groupFontSize = 45f;
-        float groupBottomMarginSize = 45f;
+        
+        float nameTop = documentTop ;
+        float nameBottom = nameTop;
+        if(exportName) {
+            nameBottom = nameTop - (documentHeight * nameHeightPercent);
+        }
+        float groupeTop = nameBottom;
+        float groupeBottom = nameBottom;
+        if(exportGroup) {
+            groupeBottom = groupeTop - (documentHeight *  groupHeightPercent);
+        }
+        float barcodeTop = groupeBottom;
+        float barcodeBottom = documentBottom;
+        
+        
+        ColumnText columnText;
         
         for(Participant participant : participants) {
-        
-            PdfPTable table = new PdfPTable(1);
-            table.setExtendLastRow(true);
 
-            PdfPCell cell;
-            cell = new PdfPCell();
-            cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-            cell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
-
-            Paragraph p = null;
+            float nameFontSize = 65f;
+            float groupFontSize = 45f;
+            float renseignementFontSize = 35f;
+            
             if(exportName) {
-                p = new Paragraph(participant.getNom().toUpperCase() + " " + participant.getPrenom());
-                p.setAlignment(Paragraph.ALIGN_CENTER);
-                p.getFont().setSize(nameFontSize);
-                p.getFont().setStyle(Font.BOLD);
-                cell.addElement(p);
+                columnText = new ColumnText(cb);
+                
+                columnText.setSimpleColumn(left, nameTop, right, nameBottom);
+                //cb.rectangle(left, nameBottom, width, (nameTop - nameBottom));
+                //cb.stroke();
+                
+                columnText.setExtraParagraphSpace(0f);
+                columnText.setAdjustFirstLine(false);
+                columnText.setIndent(0);
+                
+                String txt = participant.getNom().toUpperCase() + " " + participant.getPrenom();
+                
+                float previousPos = columnText.getYLine();
+                columnText.setText(null);
+                columnText.addElement(createCleanParagraph(txt,nameFontSize,true));
+                while(ColumnText.hasMoreText(columnText.go(true))) {
+                    nameFontSize = nameFontSize - 0.5f;
+                    columnText.setText(null);
+                    columnText.addElement(createCleanParagraph(txt,nameFontSize,true));
+                    columnText.setYLine(previousPos);
+                } 
+              
+                columnText.setText(null);
+                columnText.addElement(createCleanParagraph(txt,nameFontSize,true));
+                columnText.setYLine(previousPos);
+                columnText.go(false);
+
             }
+            
+           
             
             if(exportGroup) {
-                p = new Paragraph(participant.getGroupe());
-                p.setAlignment(Paragraph.ALIGN_CENTER);
-                p.getFont().setSize(groupFontSize);
-                cell.addElement(p);
+                columnText = new ColumnText(cb);
+
+                columnText.setSimpleColumn(document.left(), groupeTop, document.right(), groupeBottom);
+                float groupeHeight = groupeTop - groupeBottom;
+                //cb.rectangle(document.left(), groupeTop - groupeHeight, document.right() - document.left(), groupeHeight);
+                //cb.stroke();
+                
+                columnText.setExtraParagraphSpace(0f);
+                columnText.setAdjustFirstLine(false);
+                columnText.setIndent(0);
+                columnText.setFollowingIndent(0);
+                
+                String txt1 = participant.getGroupe();
+                String txt2 = exportRenseignement ? participant.getRenseignements() : null;
+                
+                float previousPos = columnText.getYLine();
+                columnText.setText(null);
+                //columnText.addElement(createCleanParagraph(txt1,groupFontSize,true,txt2,renseignementFontSize,false));
+                columnText.addElement(createCleanParagraph(txt1,groupFontSize,true));
+                columnText.addElement(createCleanParagraph(txt2,renseignementFontSize,false));
+                while(ColumnText.hasMoreText(columnText.go(true))) {
+                    groupFontSize = groupFontSize - 0.5f;
+                    renseignementFontSize = renseignementFontSize - 0.5f;
+                    columnText.setText(null);
+                    //columnText.addElement(createCleanParagraph(txt1,groupFontSize,true,txt2,renseignementFontSize,false));
+                    columnText.addElement(createCleanParagraph(txt1,groupFontSize,true));
+                    columnText.addElement(createCleanParagraph(txt2,renseignementFontSize,false));                    
+                    columnText.setYLine(previousPos);
+                } 
+              
+                columnText.setText(null);
+                //columnText.addElement(createCleanParagraph(txt1,groupFontSize,true,txt2,renseignementFontSize,false));
+                columnText.addElement(createCleanParagraph(txt1,groupFontSize,true));
+                columnText.addElement(createCleanParagraph(txt2,renseignementFontSize,false));                
+                columnText.setYLine(previousPos);
+                columnText.go(false);
+            }
+           
+            
+            {
+                columnText = new ColumnText(cb);
+
+                barcodeTop = barcodeTop - 12f;
+                columnText.setSimpleColumn(left, barcodeTop, right, barcodeBottom);
+                float barcodeHeight = barcodeTop - barcodeBottom;
+                //cb.rectangle(left, barcodeTop - barcodeHeight, width, barcodeHeight);
+                //cb.stroke();
+                
+                columnText.setExtraParagraphSpace(0f);
+                columnText.setAdjustFirstLine(false);
+                columnText.setIndent(0);
+                
+                float previousPos = columnText.getYLine();
+                columnText.setText(null);
+                columnText.addElement(createCleanBarcode(cb, participant.getNumero(),width,barcodeHeight));
+                columnText.go(false);                
             }
             
-            if(p != null) {
-                p.setSpacingAfter(groupBottomMarginSize);
-            }
-            
-
-            Barcode128 code128 = new Barcode128();
-            code128.setCode(participant.getNumero());
-            Image barcodeImage = code128.createImageWithBarcode(cb, null, null);
-            barcodeImage.setAlignment(Image.ALIGN_CENTER);
-            barcodeImage.setWidthPercentage(50f);
-            cell.addElement(barcodeImage);
-
-            table.addCell(cell);
-
-            document.add(table);        
             
             document.newPage();
+                   
+        }
+       
+        document.close();        
+    }  
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    public static BufferedImage PdfToImage(byte[] pdfFile) throws Exception {
+        PdfDecoder decode_pdf = new PdfDecoder(true);
+        /**set mappings for non-embedded fonts to use*/
+        //FontMappings.setFontReplacements();
+
+        /**open the PDF file - can also be a URL or a byte array*/
+        try {
+            decode_pdf.openPdfArray(pdfFile);
+
+            decode_pdf.setExtractionMode(PdfDecoder.FINALIMAGES); //do not save images
+            /**get page 1 as an image*/
+            BufferedImage img=decode_pdf.getPageAsImage(1);
+	
+            /**close the pdf file*/
+            decode_pdf.closePdfFile();
+            return img;
+        } catch (PdfException e) {
+            throw new Exception(e.getMessage(),e);
         }
         
-        document.close();        
-    }   
-   
-   
+    }
+
+
+
+
+
+
+
+
+
    
 }

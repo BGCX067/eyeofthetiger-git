@@ -18,6 +18,8 @@ import java.awt.event.KeyEvent;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -43,6 +45,13 @@ public class ProjectView extends javax.swing.JPanel {
         TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(jTableParticipants.getModel());
         jTableParticipants.setRowSorter(sorter);
         
+        jTableParticipants.getModel().addTableModelListener(new TableModelListener() {
+            public void tableChanged(TableModelEvent e) {
+                projectDatasChanged();
+            }
+        });
+        
+        
         jTabbedPane1.setTitleAt(0, "Projet: " + project.getName());
     }
 
@@ -51,6 +60,13 @@ public class ProjectView extends javax.swing.JPanel {
     public Project getProject() {
         return project;
     }    
+    
+    private void projectDatasChanged() {
+        if(project != null) {
+            project.setDirty(true);
+        }        
+    }
+    
     
     /** This method is called from within the constructor to
      * initialize the form.
@@ -94,6 +110,9 @@ public class ProjectView extends javax.swing.JPanel {
         columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${groupe}"));
         columnBinding.setColumnName("Groupe");
         columnBinding.setColumnClass(String.class);
+        columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${renseignements}"));
+        columnBinding.setColumnName("Renseignements");
+        columnBinding.setColumnClass(String.class);
         jTableBinding.setSourceUnreadableValue(java.util.Collections.emptyList());
         bindingGroup.addBinding(jTableBinding);
         jTableBinding.bind();org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${participantSelection}"), jTableParticipants, org.jdesktop.beansbinding.BeanProperty.create("selectedElements"));
@@ -105,10 +124,15 @@ public class ProjectView extends javax.swing.JPanel {
             }
         });
         jScrollPane1.setViewportView(jTableParticipants);
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("gui/resources/ProjectView"); // NOI18N
+        jTableParticipants.getColumnModel().getColumn(0).setHeaderValue(bundle.getString("ProjectView.jTableParticipants.columnModel.title0")); // NOI18N
+        jTableParticipants.getColumnModel().getColumn(1).setHeaderValue(bundle.getString("ProjectView.jTableParticipants.columnModel.title1")); // NOI18N
+        jTableParticipants.getColumnModel().getColumn(2).setHeaderValue(bundle.getString("ProjectView.jTableParticipants.columnModel.title2")); // NOI18N
+        jTableParticipants.getColumnModel().getColumn(3).setHeaderValue(bundle.getString("ProjectView.jTableParticipants.columnModel.title3")); // NOI18N
+        jTableParticipants.getColumnModel().getColumn(4).setHeaderValue(bundle.getString("ProjectView.jTableParticipants.columnModel.title4")); // NOI18N
 
         jButtonImport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/eyeofthetiger/gui/resources/contact_new.png"))); // NOI18N
         jButtonImport.setText(MSGS.getString("jButtonImport.text")); // NOI18N
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("gui/resources/ProjectView"); // NOI18N
         jButtonImport.setToolTipText(bundle.getString("ProjectView.jButtonImport.toolTipText")); // NOI18N
         jButtonImport.setName("jButtonImport"); // NOI18N
         jButtonImport.addActionListener(new java.awt.event.ActionListener() {
@@ -193,8 +217,14 @@ public class ProjectView extends javax.swing.JPanel {
     
 private void jTableParticipantsKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTableParticipantsKeyPressed
     if(evt.getKeyCode() == KeyEvent.VK_DELETE) {
+        jTableParticipants.setUpdateSelectionOnSort(false);
+        
         List<Participant> list = new LinkedList<Participant>(participantSelection);
         project.getParticipants().removeAll(list);
+        
+        jTableParticipants.setUpdateSelectionOnSort(true);
+        jTableParticipants.getSelectionModel().clearSelection();
+        
         evt.consume();
     }
 }//GEN-LAST:event_jTableParticipantsKeyPressed
@@ -221,10 +251,11 @@ private void jButtonNewCourseActionPerformed(java.awt.event.ActionEvent evt) {//
 
 
 public void createNewCourse() {
-    DialogCreateCourse dlg = new DialogCreateCourse(project,null, true);
+    DialogCreateOrEditCourse dlg = new DialogCreateOrEditCourse(project,null,null, true);
+    dlg.setTitle("Creation d'une nouvelle course");
     dlg.setLocationRelativeTo(this);
     dlg.setVisible(true);
-    if(dlg.getReturnStatus() == DialogCreateCourse.RET_OK) {
+    if(dlg.getReturnStatus() == DialogCreateOrEditCourse.RET_OK) {
         Course c = new Course(dlg.getNomCourse(), project);
         c.getParticipants().addAll(dlg.getRightParticipants());
         project.addCourse(c);
@@ -232,6 +263,18 @@ public void createNewCourse() {
         jTabbedPane1.setSelectedComponent(view);
     }    
 }
+
+public void editCourse(Course c) {
+    DialogCreateOrEditCourse dlg = new DialogCreateOrEditCourse(project,c,null, true);
+    dlg.setTitle("Modification des participants à la course " + c.getName());
+    dlg.setLocationRelativeTo(this);
+    dlg.setVisible(true);
+    if(dlg.getReturnStatus() == DialogCreateOrEditCourse.RET_OK) {
+        c.getParticipants().clear();
+        c.getParticipants().addAll(dlg.getRightParticipants());
+    }   
+}
+
 
 
 private CourseView addCourseView(Course c) {

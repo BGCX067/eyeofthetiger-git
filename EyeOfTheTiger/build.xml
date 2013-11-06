@@ -22,7 +22,7 @@
     <target name="-pre-jar" >
         <propertyfile file="${src.dir}/eyeofthetiger/version.properties">
             <entry key="BUILD" value="1" type="int" operation="+"/>
-            <entry key="BUILDDATE" type="date" value="now" pattern="yyyyMMDD" />
+            <entry key="BUILDDATE" type="date" value="now" pattern="yyyyMMdd" />
         </propertyfile>
     </target>     
     

@@ -60,9 +60,8 @@ public class EyeOfTheTigerAboutBox extends javax.swing.JDialog {
         jLabel4.setText("Réalisé par Christophe JALADY");
 
         jTextField1.setEditable(false);
-        jTextField1.setText("http://code.google.com/p/eyeofthetiger/");
+        jTextField1.setText("http://eyeofthetiger.googlecode.com");
         jTextField1.setBorder(null);
-        jTextField1.setCaretPosition(0);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);

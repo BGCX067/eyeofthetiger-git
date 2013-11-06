@@ -25,7 +25,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import org.jdesktop.application.Action;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 //import org.jdesktop.application.PublicMnemonicText;
 
 /**
@@ -262,7 +261,7 @@ public class MBAction extends AbstractAction {
             } else if (TEXT_KEY.equals(key)) {
                 if (newValue != null) {
                     //PublicMnemonicText.configure(this, (String) newValue);
-                    throw new NotImplementedException();
+                    throw new UnsupportedOperationException();
                 }
                 init();
             } else if (FORM_KEY.equals(key)) {

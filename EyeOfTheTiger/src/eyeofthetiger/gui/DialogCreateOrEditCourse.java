@@ -10,6 +10,7 @@
  */
 package eyeofthetiger.gui;
 
+import eyeofthetiger.model.Course;
 import eyeofthetiger.model.Participant;
 import eyeofthetiger.model.Project;
 import java.awt.event.ActionEvent;
@@ -37,35 +38,42 @@ import org.jdesktop.observablecollections.ObservableList;
  *
  * @author christophe
  */
-public class DialogCreateCourse extends javax.swing.JDialog {
+public class DialogCreateOrEditCourse extends javax.swing.JDialog {
 
-    protected static final ResourceBundle MSGS = ResourceBundle.getBundle(MBAction.classBundleBaseName(DialogCreateCourse.class));
+    protected static final ResourceBundle MSGS = ResourceBundle.getBundle(MBAction.classBundleBaseName(DialogCreateOrEditCourse.class));
     
-    /** A return status code - returned if Cancel button has been pressed */
     public static final int RET_CANCEL = 0;
-    /** A return status code - returned if OK button has been pressed */
     public static final int RET_OK = 1;
 
-    /** Creates new form DialogCreateCourse */
-    public DialogCreateCourse(Project p,java.awt.Frame parent, boolean modal) {
+
+    public DialogCreateOrEditCourse(Project p, Course c, java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         project = p;
+        course = c;
         leftParticipants.addAll(project.getParticipants());
         
         initComponents();
         
-
-        jTextFieldNom.getDocument().addDocumentListener(new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) {
-                check();
-            }
-            public void removeUpdate(DocumentEvent e) {
-                check();
-            }
-            public void changedUpdate(DocumentEvent e) {
-                check();
-            }
-        });
+        if(course == null) {
+            jTextFieldNom.getDocument().addDocumentListener(new DocumentListener() {
+                public void insertUpdate(DocumentEvent e) {
+                    check();
+                }
+                public void removeUpdate(DocumentEvent e) {
+                    check();
+                }
+                public void changedUpdate(DocumentEvent e) {
+                    check();
+                }
+            });
+        }
+        else {
+            jLabel2.setVisible(false);
+            jTextFieldNom.setVisible(false);
+            
+            leftParticipants.removeAll(course.getParticipants());
+            rightParticipants.addAll(course.getParticipants());
+        }
         
         // Close the dialog when Esc is pressed
         String cancelName = "cancel";
@@ -73,7 +81,6 @@ public class DialogCreateCourse extends javax.swing.JDialog {
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelName);
         ActionMap actionMap = getRootPane().getActionMap();
         actionMap.put(cancelName, new AbstractAction() {
-
             public void actionPerformed(ActionEvent e) {
                 doClose(RET_CANCEL);
             }
@@ -98,21 +105,23 @@ public class DialogCreateCourse extends javax.swing.JDialog {
     }
 
     private boolean check() {
-        File f = new File(project.getPath(),getNomCourse());
-        if(f.exists()) {
-            error("Course déja existante !");
-            return false;
+        if(course == null) {
+            File f = new File(project.getPath(),getNomCourse());
+            if(f.exists()) {
+                error("Course déja existante !");
+                return false;
+            }
+
+            if(getRightParticipants().size() == 0) {
+                error("Vous devez selectionez des participants");
+                return false;
+            }
         }
-        
-        if(getRightParticipants().size() == 0) {
-            error("Vous devez selectionez des participants");
-            return false;
-        }
-        
         return true;
     }
     
     private Project project;
+    private Course course;
     private Timer errorTimer = null;
     
     
@@ -254,11 +263,21 @@ public class DialogCreateCourse extends javax.swing.JDialog {
         columnBinding.setColumnName("Groupe");
         columnBinding.setColumnClass(String.class);
         columnBinding.setEditable(false);
+        columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${renseignements}"));
+        columnBinding.setColumnName("Renseignements");
+        columnBinding.setColumnClass(String.class);
+        columnBinding.setEditable(false);
         bindingGroup.addBinding(jTableBinding);
         jTableBinding.bind();org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${leftSelection}"), jTableAllParticipants, org.jdesktop.beansbinding.BeanProperty.create("selectedElements"));
         bindingGroup.addBinding(binding);
 
         jScrollPane2.setViewportView(jTableAllParticipants);
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("gui/resources/DialogCreateCourse"); // NOI18N
+        jTableAllParticipants.getColumnModel().getColumn(0).setHeaderValue(bundle.getString("DialogCreateOrEditCourse.jTableAllParticipants.columnModel.title0")); // NOI18N
+        jTableAllParticipants.getColumnModel().getColumn(1).setHeaderValue(bundle.getString("DialogCreateOrEditCourse.jTableAllParticipants.columnModel.title1")); // NOI18N
+        jTableAllParticipants.getColumnModel().getColumn(2).setHeaderValue(bundle.getString("DialogCreateOrEditCourse.jTableAllParticipants.columnModel.title2")); // NOI18N
+        jTableAllParticipants.getColumnModel().getColumn(3).setHeaderValue(bundle.getString("DialogCreateOrEditCourse.jTableAllParticipants.columnModel.title3")); // NOI18N
+        jTableAllParticipants.getColumnModel().getColumn(4).setHeaderValue(bundle.getString("DialogCreateOrEditCourse.jTableAllParticipants.columnModel.title4")); // NOI18N
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -268,7 +287,7 @@ public class DialogCreateCourse extends javax.swing.JDialog {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 478, Short.MAX_VALUE)
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Participants de la course:"));
@@ -296,11 +315,19 @@ public class DialogCreateCourse extends javax.swing.JDialog {
         columnBinding.setColumnName("Groupe");
         columnBinding.setColumnClass(String.class);
         columnBinding.setEditable(false);
+        columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${renseignements}"));
+        columnBinding.setColumnName("Renseignements");
+        columnBinding.setColumnClass(String.class);
         bindingGroup.addBinding(jTableBinding);
         jTableBinding.bind();binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${rightSelection}"), jTableCourseParticipants, org.jdesktop.beansbinding.BeanProperty.create("selectedElements"));
         bindingGroup.addBinding(binding);
 
         jScrollPane1.setViewportView(jTableCourseParticipants);
+        jTableCourseParticipants.getColumnModel().getColumn(0).setHeaderValue(bundle.getString("DialogCreateOrEditCourse.jTableCourseParticipants.columnModel.title0")); // NOI18N
+        jTableCourseParticipants.getColumnModel().getColumn(1).setHeaderValue(bundle.getString("DialogCreateOrEditCourse.jTableCourseParticipants.columnModel.title1")); // NOI18N
+        jTableCourseParticipants.getColumnModel().getColumn(2).setHeaderValue(bundle.getString("DialogCreateOrEditCourse.jTableCourseParticipants.columnModel.title2")); // NOI18N
+        jTableCourseParticipants.getColumnModel().getColumn(3).setHeaderValue(bundle.getString("DialogCreateOrEditCourse.jTableCourseParticipants.columnModel.title3")); // NOI18N
+        jTableCourseParticipants.getColumnModel().getColumn(4).setHeaderValue(bundle.getString("DialogCreateOrEditCourse.jTableCourseParticipants.columnModel.title4")); // NOI18N
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -310,7 +337,7 @@ public class DialogCreateCourse extends javax.swing.JDialog {
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 478, Short.MAX_VALUE)
         );
 
         jButtonAdd.setText(MSGS.getString("jButtonAdd.text")); // NOI18N
@@ -341,7 +368,7 @@ public class DialogCreateCourse extends javax.swing.JDialog {
                         .addGap(10, 10, 10)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(jButtonRemove, 0, 0, Short.MAX_VALUE)
-                            .addComponent(jButtonAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 59, Short.MAX_VALUE))
+                            .addComponent(jButtonAdd, javax.swing.GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
@@ -389,7 +416,7 @@ public class DialogCreateCourse extends javax.swing.JDialog {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cancelButton)
@@ -421,19 +448,36 @@ private void jButtonAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     if(leftSelection.isEmpty()) {
         return;
     }
+
+    jTableAllParticipants.setUpdateSelectionOnSort(false);
+    jTableCourseParticipants.setUpdateSelectionOnSort(false);
     
     LinkedList<Participant> ps = new LinkedList<Participant>(leftSelection);
     rightParticipants.addAll(ps);
     leftParticipants.removeAll(ps);
+    
+    jTableAllParticipants.setUpdateSelectionOnSort(true);
+    jTableCourseParticipants.setUpdateSelectionOnSort(true);    
+    jTableAllParticipants.getSelectionModel().clearSelection();
+    jTableCourseParticipants.getSelectionModel().clearSelection();
 }//GEN-LAST:event_jButtonAddActionPerformed
 
 private void jButtonRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveActionPerformed
     if(rightSelection.isEmpty()) {
         return;
     }
+    
+    jTableAllParticipants.setUpdateSelectionOnSort(false);
+    jTableCourseParticipants.setUpdateSelectionOnSort(false);    
+    
     LinkedList<Participant> ps = new LinkedList<Participant>(rightSelection);
     rightParticipants.removeAll(ps);
     leftParticipants.addAll(ps);
+    
+    jTableAllParticipants.setUpdateSelectionOnSort(true);
+    jTableCourseParticipants.setUpdateSelectionOnSort(true);    
+    jTableAllParticipants.getSelectionModel().clearSelection();
+    jTableCourseParticipants.getSelectionModel().clearSelection();    
 }//GEN-LAST:event_jButtonRemoveActionPerformed
     
     private void doClose(int retStatus) {

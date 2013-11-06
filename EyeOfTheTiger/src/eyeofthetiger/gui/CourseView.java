@@ -12,17 +12,32 @@ package eyeofthetiger.gui;
 
 import eyeofthetiger.model.Course;
 import eyeofthetiger.model.Participant;
+import eyeofthetiger.model.Participation;
 import eyeofthetiger.utils.Utils;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormat;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Period;
@@ -70,6 +85,9 @@ public class CourseView extends javax.swing.JPanel {
         
         TableRowSorter<TableModel> sorter2 = new TableRowSorter<TableModel>(jTable2.getModel());
         jTable2.setRowSorter(sorter2);
+        
+        jTable1.setUpdateSelectionOnSort(false);
+        jTable2.setUpdateSelectionOnSort(false);
     }
     
 
@@ -176,6 +194,9 @@ public class CourseView extends javax.swing.JPanel {
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
+        jLabel4 = new javax.swing.JLabel();
+        jButtonSaveXLS = new javax.swing.JButton();
+        jButtonOpenXLS = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
@@ -340,15 +361,50 @@ public class CourseView extends javax.swing.JPanel {
         jTable2.getColumnModel().getColumn(3).setHeaderValue(bundle.getString("CourseView.jTable2.columnModel.title3")); // NOI18N
         jTable2.getColumnModel().getColumn(4).setCellRenderer(getDateRenderer());
 
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/eyeofthetiger/gui/resources/application_vnd_ms_excel_32x32.png"))); // NOI18N
+        jLabel4.setText(bundle.getString("CourseView.jLabel4.text")); // NOI18N
+        jLabel4.setName("jLabel4"); // NOI18N
+
+        jButtonSaveXLS.setIcon(new javax.swing.ImageIcon(getClass().getResource("/eyeofthetiger/gui/resources/gnome_document_save_32x32.png"))); // NOI18N
+        jButtonSaveXLS.setText(bundle.getString("CourseView.jButtonSaveXLS.text")); // NOI18N
+        jButtonSaveXLS.setName("jButtonSaveXLS"); // NOI18N
+        jButtonSaveXLS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonSaveXLSActionPerformed(evt);
+            }
+        });
+
+        jButtonOpenXLS.setIcon(new javax.swing.ImageIcon(getClass().getResource("/eyeofthetiger/gui/resources/application_vnd_ms_excel_32x32.png"))); // NOI18N
+        jButtonOpenXLS.setText(bundle.getString("CourseView.jButtonOpenXLS.text")); // NOI18N
+        jButtonOpenXLS.setName("jButtonOpenXLS"); // NOI18N
+        jButtonOpenXLS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonOpenXLSActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonSaveXLS)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonOpenXLS)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(jButtonSaveXLS)
+                    .addComponent(jButtonOpenXLS)))
         );
 
         jSplitPane1.setLeftComponent(jPanel1);
@@ -401,11 +457,11 @@ public class CourseView extends javax.swing.JPanel {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 483, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 417, Short.MAX_VALUE)
         );
 
         jSplitPane1.setRightComponent(jPanel2);
@@ -440,11 +496,9 @@ public class CourseView extends javax.swing.JPanel {
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(6, 6, 6)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(5, 5, 5)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jTextFieldNumeroArrivant, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2)))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jTextFieldNumeroArrivant, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel2))
                     .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSplitPane1))
@@ -497,6 +551,137 @@ private void jButtonNouveauTopDepartActionPerformed(java.awt.event.ActionEvent e
     switchMode(Mode.duringRace);
 }//GEN-LAST:event_jButtonNouveauTopDepartActionPerformed
 
+    private void jButtonSaveXLSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSaveXLSActionPerformed
+        try {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileChooser.setMultiSelectionEnabled(false);
+            if(fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                if(!file.getName().toLowerCase().endsWith(".xls")) {
+                    file = new File(file.getParentFile(),file.getName()+".xls");
+                }
+                exportAsXLS(file);        
+            }
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur ! " + e.getMessage());
+        }
+    }//GEN-LAST:event_jButtonSaveXLSActionPerformed
+
+    private void jButtonOpenXLSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOpenXLSActionPerformed
+        try {
+            File file = File.createTempFile("eyeofthetiger", ".xls");
+            exportAsXLS(file);
+            Desktop.getDesktop().open(file);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur ! " + e.getMessage());
+        }
+    }//GEN-LAST:event_jButtonOpenXLSActionPerformed
+
+
+
+
+    private void exportAsXLS(File outputFile) throws Exception {
+        Workbook wb = new HSSFWorkbook();
+        Sheet sheet  = wb.createSheet("Course " + course.getName());
+
+        CellStyle cellDateHourStyle = wb.createCellStyle();
+        DataFormat df = wb.createDataFormat();
+        cellDateHourStyle.setDataFormat(df.getFormat("yyyy/MM/dd hh:mm:ss;@"));
+
+        PeriodFormatter durationFormat = new PeriodFormatterBuilder().printZeroAlways()
+                                        .appendHours().minimumPrintedDigits(2).appendSeparator("h")
+                                        .appendMinutes().minimumPrintedDigits(2).appendSeparator("mn")
+                                        .appendSeconds().minimumPrintedDigits(2).appendLiteral("s")
+                                        .toFormatter().withLocale(Locale.UK);
+        
+        
+        int rowIndex = 0;
+        int cellIndex = 0;
+        Row row = sheet.createRow(rowIndex++);
+        Cell cell = null;
+
+        row.createCell(cellIndex++).setCellValue("GROUPE");
+        row.createCell(cellIndex++).setCellValue("NUMERO");
+        row.createCell(cellIndex++).setCellValue("NOM");
+        row.createCell(cellIndex++).setCellValue("PRENOM");
+        row.createCell(cellIndex++).setCellValue("TEMPS");
+        row.createCell(cellIndex++).setCellValue("DEPART");
+        row.createCell(cellIndex++).setCellValue("ARRIVEE");
+        row.createCell(cellIndex++).setCellValue("RENSEIGNEMENTS");
+        row.createCell(cellIndex++).setCellValue("INSCRIPTION");
+
+        HashSet<Participant> _participants = new HashSet<Participant>(course.getParticipants());
+        
+        for(Participation p : course.getParticipations()) {
+            cellIndex = 0;
+            row = sheet.createRow(rowIndex++);
+            row.createCell(cellIndex++).setCellValue("" + p.getParticipant().getGroupe());
+            row.createCell(cellIndex++).setCellValue("" + p.getParticipant().getNumero());
+            row.createCell(cellIndex++).setCellValue("" + p.getParticipant().getNom());
+            row.createCell(cellIndex++).setCellValue("" + p.getParticipant().getPrenom());
+
+            cell = row.createCell(cellIndex++);
+            cell.setCellType(Cell.CELL_TYPE_STRING);
+            Duration duration = new Duration(p.getDepart(),p.getArrivee());
+            cell.setCellValue(durationFormat.print(duration.toPeriod()));
+
+            cell = row.createCell(cellIndex++);
+            cell.setCellValue(p.getDepart().toDate());
+            cell.setCellStyle(cellDateHourStyle);
+
+            cell = row.createCell(cellIndex++);
+            cell.setCellValue(p.getArrivee().toDate());
+            cell.setCellValue(p.getArrivee().toDate());
+            cell.setCellStyle(cellDateHourStyle);
+            
+            row.createCell(cellIndex++).setCellValue("" + p.getParticipant().getRenseignements());
+            
+            cell = row.createCell(cellIndex++);
+            cell.setCellValue(p.getParticipant().getDateInscription().toDate());
+            cell.setCellStyle(cellDateHourStyle);
+            
+            _participants.remove(p.getParticipant());
+        }
+        
+        for(Participant p : _participants) {
+            cellIndex = 0;
+            row = sheet.createRow(rowIndex++);
+            row.createCell(cellIndex++).setCellValue("" + p.getGroupe());
+            row.createCell(cellIndex++).setCellValue("" + p.getNumero());
+            row.createCell(cellIndex++).setCellValue("" + p.getNom());
+            row.createCell(cellIndex++).setCellValue("" + p.getPrenom());
+
+            cell = row.createCell(cellIndex++);
+            //cell.setCellType(Cell.CELL_TYPE_STRING);
+            //Duration duration = new Duration(p.getDepart(),p.getArrivee());
+            //cell.setCellValue(durationFormat.print(duration.toPeriod()));
+
+            cell = row.createCell(cellIndex++);
+            //cell.setCellValue(p.getDepart().toDate());
+            //cell.setCellStyle(cellDateHourStyle);
+
+            cell= row.createCell(cellIndex++);
+            //cell.setCellValue(p.getArrivee().toDate());
+            //cell.setCellValue(p.getArrivee().toDate());
+            //cell.setCellStyle(cellDateHourStyle);
+            
+            row.createCell(cellIndex++).setCellValue("" + p.getRenseignements());
+            
+            cell = row.createCell(cellIndex++);
+            cell.setCellValue(p.getDateInscription().toDate());
+            cell.setCellStyle(cellDateHourStyle);           
+        }
+
+        FileOutputStream fileOut = new FileOutputStream(outputFile);
+        wb.write(fileOut);
+        fileOut.close();
+
+    }
 
 
     private TableCellRenderer hourRenderer;
@@ -663,9 +848,12 @@ static class DurationRenderer extends DefaultTableCellRenderer {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonMode;
     private javax.swing.JButton jButtonNouveauTopDepart;
+    private javax.swing.JButton jButtonOpenXLS;
+    private javax.swing.JButton jButtonSaveXLS;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabelArrivee;
     private javax.swing.JLabel jLabelChrono;
     private javax.swing.JLabel jLabelDepart;

@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -114,7 +115,8 @@ public class Course {
        return null;
    }
    
-   protected ObservableList<Participation> participations = ObservableCollections.observableList(new ArrayList<Participation>());
+   protected List<Participation> synchronizedParticipations = Collections.synchronizedList(new LinkedList<Participation>());
+   protected ObservableList<Participation> participations = ObservableCollections.observableList(synchronizedParticipations);
    public ObservableList<Participation> getParticipations() {
         return participations;
    }    
@@ -187,14 +189,29 @@ public class Course {
    }
 
    public void save() throws Exception {
-       save(project.getCoursePath(this));
-       //TODO: manage rolling backup
+       File folder = project.getCoursePath(this);
+       folder.mkdirs();
+       File resultatsFileTmp = new File(folder,"resultats.csv.tmp");
+       save(resultatsFileTmp);
+       File resultatsFile = new File(folder,"resultats.csv");
+       if(resultatsFile.exists()) {
+           resultatsFile.delete();
+       }
+       resultatsFileTmp.renameTo(resultatsFile);
+       
+       File configFileTmp = new File(folder, "config.ini.tmp");
+       writeConfig(configFileTmp);
+       File configFile = new File(folder,"config.ini");
+       if(configFile.exists()) {
+           configFile.delete();
+       }
+       configFileTmp.renameTo(configFile);
+       
+       setDirty(false);
    }
    
-   private void save(File folder) throws Exception {
-       //TODO: create kind of autosave
-       folder.mkdirs();
-       PrintWriter pw = new PrintWriter(new File(folder,"resultats.csv"),"UTF-8");
+   private void save(File resultatsFile) throws Exception {
+       PrintWriter pw = new PrintWriter(resultatsFile,"UTF-8");
        
        HashSet<Participant> _participants = new HashSet<Participant>(getParticipants());
        List<Participation> _participations = new LinkedList<Participation>(getParticipations());
@@ -204,7 +221,7 @@ public class Course {
        DateTimeFormatter preciseHourFormat = createPreciseHourFormat();
        PeriodFormatter chronoFormat = createChronoFormat();
        
-       pw.write("Numero;Nom;Prenom;Groupe;DateInscription;HeureInscription;DateDepart;HeureDepart;DateArrivee;HeureArrive;Temps;TempsEnDixiemeDeSecondes");
+       pw.write("Numero;Nom;Prenom;Groupe;Renseignements;DateInscription;HeureInscription;DateDepart;HeureDepart;DateArrivee;HeureArrive;Temps;TempsEnDixiemeDeSecondes");
        pw.println();
        
        for(Participation p : _participations) {
@@ -215,6 +232,8 @@ public class Course {
            pw.write(p.getParticipant().getPrenom());
            pw.append(';');
            pw.write(p.getParticipant().getGroupe());
+           pw.append(';');
+           pw.write(p.getParticipant().getRenseignements());
            pw.append(';');
            pw.write(dateFormat.print(p.getParticipant().getDateInscription()));
            pw.append(';');
@@ -250,6 +269,8 @@ public class Course {
            pw.append(';');
            pw.write(p.getGroupe());
            pw.append(';');
+           pw.write(p.getRenseignements());
+           pw.append(';');
            pw.write(dateFormat.print(p.getDateInscription()));
            pw.append(';');
            pw.write(hourFormat.print(p.getDateInscription()));
@@ -263,12 +284,6 @@ public class Course {
        }   
        
        pw.close();
-       
-       File configFile = new File(folder, "config.ini");
-       writeConfig(configFile);
-       
-       //TODO: how to be sure ? -> better to be async ?
-       //setDirty(false);
    }
    
    public static Course LoadFrom(Project project, File folder) throws Exception {
@@ -292,22 +307,32 @@ public class Course {
         reader.readHeaders();
         Course course = new Course(name, project);        
         while(reader.readRecord()) {
+            int i = 0;
             Participant participant = new Participant();
-            participant.setNumero(reader.get(0));
-            participant.setNom(reader.get(1));
-            participant.setPrenom(reader.get(2));
-            participant.setGroupe(reader.get(3));
-            String dateHour = reader.get(4) + " " + reader.get(5);
+            participant.setNumero(reader.get(i));
+            i++;
+            participant.setNom(reader.get(i));
+            i++;
+            participant.setPrenom(reader.get(i));
+            i++;
+            participant.setGroupe(reader.get(i));
+            i++;
+            participant.setRenseignements(reader.get(i));
+            i++;
+            String dateHour = reader.get(i) + " " + reader.get(i+1);
+            i++;i++;
             participant.setDateInscription(dateHourFormat.parseDateTime(dateHour));
             course.getParticipants().add(participant);
 
             //try to create participation
-            String str = (reader.get(6) + " " + reader.get(7)).trim();
+            String str = (reader.get(i) + " " + reader.get(i+1)).trim();
+            i++;i++;
             DateTime startDate = null;
             if(! str.isEmpty()) {
                 startDate = datePreciseHourFormat.parseDateTime(str);
             }
-            str = (reader.get(8) + " " + reader.get(9)).trim();
+            str = (reader.get(i) + " " + reader.get(i+1)).trim();
+            i++;i++;
             DateTime endDate = null;
             if(! str.isEmpty()) {
                 endDate = datePreciseHourFormat.parseDateTime(str);

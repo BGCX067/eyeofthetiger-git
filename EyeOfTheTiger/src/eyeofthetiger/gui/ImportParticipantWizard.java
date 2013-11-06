@@ -14,9 +14,13 @@ import com.csvreader.CsvReader;
 import eyeofthetiger.model.Participant;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.ResourceBundle;
 import javax.swing.JFileChooser;
 import javax.swing.ScrollPaneConstants;
@@ -25,6 +29,10 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
 import org.jdesktop.observablecollections.ObservableCollections;
 import org.jdesktop.observablecollections.ObservableList;
 
@@ -60,13 +68,102 @@ public class ImportParticipantWizard extends javax.swing.JPanel {
         
         TableRowSorter<TableModel> sorterCourseParticipants = new TableRowSorter<TableModel>(jTableParticipant.getModel());
         jTableParticipant.setRowSorter(sorterCourseParticipants);
+        
+        Map<String,Charset> charsets = Charset.availableCharsets();
+        jComboBoxCharset.removeAllItems();
+        jComboBoxCharset.addItem(DEFAULT_CHARSET);
+        for(String s: charsets.keySet()) {
+            jComboBoxCharset.addItem(s);
+        }
+        jComboBoxCharset.setSelectedItem(DEFAULT_CHARSET);
+        
+        jComboBoxCharset.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                doImport();
+            }
+        });
     }
 
+    private static String DEFAULT_CHARSET = "_default_";
            
     
     protected ObservableList<Participant> participants = ObservableCollections.observableList(new ArrayList<Participant>());
     public ObservableList<Participant> getParticipants() {
         return participants;
+    }
+    
+    
+    private static abstract class DataFileReader {
+        public abstract boolean readNext() throws Exception;
+        public abstract String getField(int i) throws Exception;
+    }
+    
+    
+    private static class CSVDataFileReader extends DataFileReader {
+        private CsvReader csvReader = null;
+        private CSVDataFileReader(File file, String charset, char delimiter, boolean skipFirstLine) throws Exception {
+            
+            if(DEFAULT_CHARSET.equals(charset)) {
+               csvReader = new CsvReader(file.getAbsolutePath());
+            }
+            else {
+                csvReader = new CsvReader(new FileInputStream(file),Charset.forName(charset));
+            }
+            csvReader.setDelimiter(delimiter);
+            if(skipFirstLine) {
+                csvReader.readHeaders();
+            }
+        }
+        
+        @Override
+        public boolean readNext() throws Exception {
+            return csvReader.readRecord();
+        }
+
+        @Override
+        public String getField(int i) throws Exception {
+            if(i<csvReader.getColumnCount()) {
+                return csvReader.get(i);
+             }
+            return null;
+        }
+        
+    }
+    
+    
+    
+    private static class XLSDataFileReader extends DataFileReader {
+        private Iterator<Row> rowIterator = null;
+        private Row currentRow = null;
+        private XLSDataFileReader(File xlsFile, boolean skipFirstLine) throws Exception {
+            FileInputStream is = new FileInputStream(xlsFile);
+            HSSFWorkbook workbook = new HSSFWorkbook(is);
+            HSSFSheet sheet = workbook.getSheetAt(0);
+            rowIterator = sheet.iterator();
+            if(skipFirstLine && rowIterator.hasNext()) {
+                rowIterator.next();
+            }
+        }
+       
+        @Override
+        public boolean readNext() throws Exception {
+            if(rowIterator.hasNext()) {
+                currentRow = rowIterator.next();
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public String getField(int i) throws Exception {
+            if(currentRow != null) {
+                Cell cell = currentRow.getCell(i);
+                if(cell != null) {
+                    return cell.getStringCellValue();
+                }
+            }
+            return null;
+        }
     }
     
     
@@ -79,40 +176,56 @@ public class ImportParticipantWizard extends javax.swing.JPanel {
         boolean skipFirstLine = jCheckBoxSkipFirstLine.isSelected();
         
         try {
-            CsvReader csvReader = new CsvReader(fileName);
-            char delimiter = ';';
-            String strDelim = jTextFieldDelimiter.getText();
-            if(strDelim != null && strDelim.length() == 1) {
-                delimiter = strDelim.charAt(0);
+            DataFileReader dataFileReader = null;
+            if(fileName.toLowerCase().endsWith(".xls")) {
+                dataFileReader = new XLSDataFileReader(new File(fileName), skipFirstLine);
             }
-            csvReader.setDelimiter(delimiter);
-            if(skipFirstLine) {
-                csvReader.readHeaders();
+            else {
+                CSVDataFileReader csvDataFileReader = null;
+                String selectedCharset = ""+jComboBoxCharset.getSelectedItem();
+                char delimiter = ';';
+                String strDelim = jTextFieldDelimiter.getText();
+                if(strDelim != null && strDelim.length() == 1) {
+                    delimiter = strDelim.charAt(0);
+                }
+                csvDataFileReader = new CSVDataFileReader(new File(fileName), selectedCharset, delimiter, skipFirstLine);
+                dataFileReader = csvDataFileReader;
             }
         
-            while (csvReader.readRecord()) {
-                // I must try to read up to 4 fields: id;firstname;name;group
+            while (dataFileReader.readNext()) {
+                // I must try to read up to 5 fields: id;firstname;name;group;renseignements
                 Participant p = new Participant();
                 int i = 0;
+                String value = null;
                 if(firstColumnIsNumber) {
-                    if(i<csvReader.getColumnCount()) {
-                        p.setNumero(csvReader.get(i));
+                    value = dataFileReader.getField(i);
+                    if(value != null) {
+                        p.setNumero(value);
                     }
                     i++;
                 }
 
-                if(i<csvReader.getColumnCount()) {
-                    p.setNom(csvReader.get(i));
+                value = dataFileReader.getField(i);
+                if(value != null) {
+                    p.setNom(value);
                 }
                 i++;
 
-                if(i<csvReader.getColumnCount()) {
-                    p.setPrenom(csvReader.get(i));
+                value = dataFileReader.getField(i);
+                if(value != null) {
+                    p.setPrenom(value);
                 }
                 i++;
 
-                if(i<csvReader.getColumnCount()) {
-                    p.setGroupe(csvReader.get(i));
+                value = dataFileReader.getField(i);
+                if(value != null) {
+                    p.setGroupe(value);
+                }
+                i++;
+
+                value = dataFileReader.getField(i);
+                if(value != null) {
+                    p.setRenseignements(value);
                 }
                 i++;
                 
@@ -122,7 +235,7 @@ public class ImportParticipantWizard extends javax.swing.JPanel {
         catch(FileNotFoundException e) {
             error("Le fichier est introuvable !");
         }
-        catch(IOException e) {
+        catch(Exception e) {
             error("Erreur lors de la lecture du fichier: " + e.getLocalizedMessage());
         }
     }
@@ -201,6 +314,7 @@ public class ImportParticipantWizard extends javax.swing.JPanel {
         jTextFieldDelimiter = new javax.swing.JTextField();
         jScrollPaneTextMessage = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
+        jComboBoxCharset = new javax.swing.JComboBox();
         jLabelError = new javax.swing.JLabel();
 
         setName("Form"); // NOI18N
@@ -229,10 +343,19 @@ public class ImportParticipantWizard extends javax.swing.JPanel {
         columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${groupe}"));
         columnBinding.setColumnName("Groupe");
         columnBinding.setColumnClass(String.class);
+        columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${renseignements}"));
+        columnBinding.setColumnName("Renseignements");
+        columnBinding.setColumnClass(String.class);
         jTableBinding.setSourceUnreadableValue(java.util.Collections.emptyList());
         bindingGroup.addBinding(jTableBinding);
         jTableBinding.bind();
         jScrollPane2.setViewportView(jTableParticipant);
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("gui/resources/ImportParticipantWizard"); // NOI18N
+        jTableParticipant.getColumnModel().getColumn(0).setHeaderValue(bundle.getString("ImportParticipantWizard.jTableParticipant.columnModel.title0")); // NOI18N
+        jTableParticipant.getColumnModel().getColumn(1).setHeaderValue(bundle.getString("ImportParticipantWizard.jTableParticipant.columnModel.title1")); // NOI18N
+        jTableParticipant.getColumnModel().getColumn(2).setHeaderValue(bundle.getString("ImportParticipantWizard.jTableParticipant.columnModel.title2")); // NOI18N
+        jTableParticipant.getColumnModel().getColumn(3).setHeaderValue(bundle.getString("ImportParticipantWizard.jTableParticipant.columnModel.title3")); // NOI18N
+        jTableParticipant.getColumnModel().getColumn(4).setHeaderValue(bundle.getString("ImportParticipantWizard.jTableParticipant.columnModel.title4")); // NOI18N
 
         jToggleButtonGenerateNumber.setText(MSGS.getString("jToggleButtonGenerateNumber.text")); // NOI18N
         jToggleButtonGenerateNumber.setName("jToggleButtonGenerateNumber"); // NOI18N
@@ -246,7 +369,6 @@ public class ImportParticipantWizard extends javax.swing.JPanel {
         jLabel3.setName("jLabel3"); // NOI18N
 
         jTextFieldNumberFormat.setText(MSGS.getString("jTextFieldNumberFormat.text")); // NOI18N
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("gui/resources/ImportParticipantWizard"); // NOI18N
         jTextFieldNumberFormat.setToolTipText(bundle.getString("ImportParticipantWizard.jTextFieldNumberFormat.toolTipText")); // NOI18N
         jTextFieldNumberFormat.setName("jTextFieldNumberFormat"); // NOI18N
 
@@ -296,14 +418,18 @@ public class ImportParticipantWizard extends javax.swing.JPanel {
 
         jScrollPaneTextMessage.setName("jScrollPaneTextMessage"); // NOI18N
 
-        jTextPane1.setBorder(null);
         jTextPane1.setEditable(false);
+        jTextPane1.setBorder(null);
         jTextPane1.setText(MSGS.getString("jTextPane1.text")); // NOI18N
         jTextPane1.setFocusCycleRoot(false);
         jTextPane1.setFocusable(false);
         jTextPane1.setName("jTextPane1"); // NOI18N
         jTextPane1.setRequestFocusEnabled(false);
         jScrollPaneTextMessage.setViewportView(jTextPane1);
+
+        jComboBoxCharset.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBoxCharset.setToolTipText(bundle.getString("ImportParticipantWizard.jComboBoxCharset.toolTipText")); // NOI18N
+        jComboBoxCharset.setName("jComboBoxCharset"); // NOI18N
 
         javax.swing.GroupLayout jPanelInnerLayout = new javax.swing.GroupLayout(jPanelInner);
         jPanelInner.setLayout(jPanelInnerLayout);
@@ -314,6 +440,14 @@ public class ImportParticipantWizard extends javax.swing.JPanel {
                 .addGroup(jPanelInnerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 620, Short.MAX_VALUE)
                     .addGroup(jPanelInnerLayout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(9, 9, 9)
+                        .addComponent(jTextFieldFile)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonChooseFile)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jComboBoxCharset, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanelInnerLayout.createSequentialGroup()
                         .addComponent(jToggleButtonGenerateNumber)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel3)
@@ -322,13 +456,8 @@ public class ImportParticipantWizard extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextFieldStartNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanelInnerLayout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(9, 9, 9)
-                        .addComponent(jTextFieldFile, javax.swing.GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonChooseFile))
+                        .addComponent(jTextFieldStartNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanelInnerLayout.createSequentialGroup()
                         .addGroup(jPanelInnerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jCheckBoxFirstColumnIsNumber)
@@ -348,7 +477,8 @@ public class ImportParticipantWizard extends javax.swing.JPanel {
                 .addGroup(jPanelInnerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextFieldFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1)
-                    .addComponent(jButtonChooseFile))
+                    .addComponent(jButtonChooseFile)
+                    .addComponent(jComboBoxCharset, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelInnerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanelInnerLayout.createSequentialGroup()
@@ -361,7 +491,7 @@ public class ImportParticipantWizard extends javax.swing.JPanel {
                             .addComponent(jTextFieldDelimiter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jScrollPaneTextMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelInnerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jToggleButtonGenerateNumber)
@@ -411,6 +541,7 @@ private void jTextFieldFileActionPerformed(java.awt.event.ActionEvent evt) {//GE
     private javax.swing.JButton jButtonChooseFile;
     private javax.swing.JCheckBox jCheckBoxFirstColumnIsNumber;
     private javax.swing.JCheckBox jCheckBoxSkipFirstLine;
+    private javax.swing.JComboBox jComboBoxCharset;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

@@ -4,6 +4,13 @@
  */
 package eyeofthetiger.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Method;
@@ -11,6 +18,9 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
 
 /**
  * Some utility functions.
@@ -188,5 +198,39 @@ public class Utils {
         }
         return msg;
     }     
+    
+    
+    public static boolean ShowOkCancelDialog(Frame parent,String title, JPanel panel,Dimension size) {
+        final boolean b[] = new boolean[] {false};
+        final JDialog dlg = new JDialog(parent, title);
+        dlg.getContentPane().setLayout(new BorderLayout());
+        JPanel okCancelPanel = new JPanel();
+        okCancelPanel.setLayout(new FlowLayout());
+        JButton ok = new JButton("Ok");
+        ok.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                b[0] = true;
+                dlg.setVisible(false);
+            }
+        });
+        JButton cancel = new JButton("Annuler");
+        cancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                b[0] = false;
+                dlg.setVisible(false);
+            }
+        });
+        okCancelPanel.add(ok);
+        okCancelPanel.add(cancel);
+        dlg.add(okCancelPanel,BorderLayout.SOUTH);
+        dlg.add(panel,BorderLayout.CENTER);
+        dlg.setModal(true);
+        dlg.pack();
+        if(size != null) {
+            dlg.setSize(size);
+        }
+        dlg.setVisible(true);
+        return b[0];
+    }
     
 }

@@ -1,0 +1,16 @@
+Version du 2013/11/06
+* Correction de l'export PDF des dossards (réduit la police de caractères pour ne pas faire déborder les écritures de la page)
+* Possibliité d'ajouter deux logos aux dossards
+* Import des participants au format xls
+
+Version du 2013/10/25
+* Permet l'export XLS (sauvegarde ou ouverture directe) d'une course depuis la course.
+
+Version du ???
+* Les projet précédent ne serons plus compatibles avec cette version.
+* Ajoute un nouveau champs "renseignements" pour les participants
+* Corrige un problème d'affichage lors de l'ouverture d'un projet.
+* Corrige un problème de performance lors de la création de courses ou la suppression de participants.
+* Mise en place d'une sauvegarde automatique du projet.
+* Corrige un problème lors de l'export des dossards
+* Propose de choisir l'encodage de fichier lors de l'import CSV.

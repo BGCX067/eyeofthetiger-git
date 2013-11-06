@@ -115,11 +115,10 @@
     <Component class="javax.swing.JTextField" name="jTextField1">
       <Properties>
         <Property name="editable" type="boolean" value="false"/>
-        <Property name="text" type="java.lang.String" value="http://code.google.com/p/eyeofthetiger/"/>
+        <Property name="text" type="java.lang.String" value="http://eyeofthetiger.googlecode.com"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="null"/>
         </Property>
-        <Property name="caretPosition" type="int" value="0"/>
       </Properties>
     </Component>
   </SubComponents>

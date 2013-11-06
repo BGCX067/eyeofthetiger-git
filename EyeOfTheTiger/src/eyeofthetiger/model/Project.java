@@ -1,11 +1,15 @@
-/*
+    /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package eyeofthetiger.model;
 
 import com.csvreader.CsvReader;
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -27,9 +31,9 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class Project {
     
-    
+    public static String PROJECT_OPTIONS_FILE = "options.xml";
     public static String PROJECT_PARTICIPANT_CSV_FILE = "participants.csv";
-    
+    public static String PROJECT_PARTICIPANT_CSV_FILE_TMP = "participants.csv.tmp";
     
     public Project(String name, File path) {
         this.path = path;
@@ -69,6 +73,10 @@ public class Project {
         dirty = b;
     }    
     
+    private Options options = new Options();
+    public Options getOptions() {
+        return options;
+    }
     
     protected ObservableList<Participant> participants = ObservableCollections.observableList(new ArrayList<Participant>());
     public ObservableList<Participant> getParticipants() {
@@ -90,7 +98,6 @@ public class Project {
         File courseParentFolder = coursePath.getParentFile();
         String courseFolderName = coursePath.getName();
         File renamedCoursePath = null;
-        String error  = null;
         int i = 0;
         do {
             renamedCoursePath = new File(courseParentFolder, "deleted" + i + "_" + courseFolderName);
@@ -126,19 +133,60 @@ public class Project {
    
    
    
-   public void save()throws Exception {
-       save(this.getPath());
+   public void saveOptions() throws Exception {
+        File folder = this.getPath();
+        File optionsFile = new File(folder,PROJECT_OPTIONS_FILE);
+        XMLEncoder encoder = new XMLEncoder(new FileOutputStream(optionsFile));
+        try {
+            encoder.writeObject(options);
+            encoder.flush();
+        }
+        catch(Exception e) {
+            throw e;
+        }
    }
    
-   private void save(File folder) throws Exception {
-       PrintWriter pw = new PrintWriter(new File(folder,Project.PROJECT_PARTICIPANT_CSV_FILE), "UTF-8");
+   
+   public void loadOptions() throws Exception {
+        File folder = this.getPath();
+        File optionsFile = new File(folder,PROJECT_OPTIONS_FILE);
+        if(optionsFile.exists()) {
+            XMLDecoder decoder = new XMLDecoder(new FileInputStream(optionsFile));
+            try {
+                options = (Options)decoder.readObject();
+            }
+            catch(Exception e) {
+                options = new Options();
+                throw new Exception("Impossible de charger les options du projets.",e);
+            }
+        }
+        else {
+            options = new Options();
+        }
+   }
+   
+   public void save()throws Exception {
+       File folder = this.getPath();
+       File fileTmp = new File(folder,Project.PROJECT_PARTICIPANT_CSV_FILE_TMP);
+       save(fileTmp);
+       File file = new File(folder,Project.PROJECT_PARTICIPANT_CSV_FILE);
+       if(file.exists()) {
+           file.delete();
+       }
+       fileTmp.renameTo(file);
+       
+       setDirty(false);
+   }
+   
+   private void save(File file) throws Exception {
+       PrintWriter pw = new PrintWriter(file, "UTF-8");
        
        HashSet<Participant> _participants = new HashSet<Participant>(getParticipants());
        
        DateTimeFormatter dateFormat = createDateFormat();
        DateTimeFormatter hourFormat = createHourFormat();
        
-       pw.write("Numero;Nom;Prenom;Groupe;DateInscription;HeureInscription");
+       pw.write("Numero;Nom;Prenom;Groupe;Renseignements;DateInscription;HeureInscription");
        pw.println();
        
        for(Participant p : _participants) {
@@ -150,6 +198,8 @@ public class Project {
            pw.append(';');
            pw.write(p.getGroupe());
            pw.append(';');
+           pw.write(p.getRenseignements());
+           pw.append(';');
            pw.write(dateFormat.print(p.getDateInscription()));
            pw.append(';');
            pw.write(hourFormat.print(p.getDateInscription()));
@@ -157,9 +207,6 @@ public class Project {
        }
 
        pw.close();
-       
-       //TODO: not working if we change the name of a participant in the Table
-       //setDirty(false);
    }    
     
     
@@ -179,12 +226,20 @@ public class Project {
         reader.readHeaders();        
         Project project = new Project(name, folder);        
         while(reader.readRecord()) {
+            int i = 0;
             Participant p = new Participant();
-            p.setNumero(reader.get(0));
-            p.setNom(reader.get(1));
-            p.setPrenom(reader.get(2));
-            p.setGroupe(reader.get(3));
-            String dateHourString = reader.get(4) + " " + reader.get(5);
+            p.setNumero(reader.get(i));
+            i++;
+            p.setNom(reader.get(i));
+            i++;
+            p.setPrenom(reader.get(i));
+            i++;
+            p.setGroupe(reader.get(i));
+            i++;
+            p.setRenseignements(reader.get(i));
+            i++;
+            String dateHourString = reader.get(i) + " " + reader.get(i+1);
+            i++;i++;
             p.setDateInscription(dateHourFormat.parseDateTime(dateHourString));
             project.getParticipants().add(p);
         }
@@ -205,6 +260,8 @@ public class Project {
             }
         }
         
+        
+        project.loadOptions();
         return project;
     }
     

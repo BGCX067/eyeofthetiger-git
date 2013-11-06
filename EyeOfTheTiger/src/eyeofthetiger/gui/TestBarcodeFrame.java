@@ -120,17 +120,26 @@ public class TestBarcodeFrame extends javax.swing.JFrame {
         columnBinding.setColumnName("Groupe");
         columnBinding.setColumnClass(String.class);
         columnBinding.setEditable(false);
+        columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${renseignements}"));
+        columnBinding.setColumnName("Renseignements");
+        columnBinding.setColumnClass(String.class);
+        columnBinding.setEditable(false);
         bindingGroup.addBinding(jTableBinding);
         jTableBinding.bind();org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${selectedParticipant}"), jTableParticipant, org.jdesktop.beansbinding.BeanProperty.create("selectedElement"));
         bindingGroup.addBinding(binding);
 
         jScrollPane1.setViewportView(jTableParticipant);
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("gui/resources/TestBarcodeFrame"); // NOI18N
+        jTableParticipant.getColumnModel().getColumn(0).setHeaderValue(bundle.getString("TestBarcodeFrame.jTableParticipant.columnModel.title0")); // NOI18N
+        jTableParticipant.getColumnModel().getColumn(1).setHeaderValue(bundle.getString("TestBarcodeFrame.jTableParticipant.columnModel.title1")); // NOI18N
+        jTableParticipant.getColumnModel().getColumn(2).setHeaderValue(bundle.getString("TestBarcodeFrame.jTableParticipant.columnModel.title2")); // NOI18N
+        jTableParticipant.getColumnModel().getColumn(3).setHeaderValue(bundle.getString("TestBarcodeFrame.jTableParticipant.columnModel.title3")); // NOI18N
+        jTableParticipant.getColumnModel().getColumn(4).setHeaderValue(bundle.getString("TestBarcodeFrame.jTableParticipant.columnModel.title4")); // NOI18N
 
         jPanelParticipant.setBackground(new java.awt.Color(255, 255, 255));
         jPanelParticipant.setForeground(new java.awt.Color(255, 255, 255));
         jPanelParticipant.setName("jPanelParticipant"); // NOI18N
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("gui/resources/TestBarcodeFrame"); // NOI18N
         jPanelParticipantPanel.setName(bundle.getString("TestBarcodeFrame.jPanelParticipantPanel.name")); // NOI18N
 
         javax.swing.GroupLayout jPanelParticipantPanelLayout = new javax.swing.GroupLayout(jPanelParticipantPanel);

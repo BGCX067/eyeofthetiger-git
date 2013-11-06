@@ -13,6 +13,7 @@ package eyeofthetiger.gui;
 import eyeofthetiger.model.Course;
 import eyeofthetiger.model.Participant;
 import eyeofthetiger.model.Project;
+import eyeofthetiger.utils.PDFDossardGenerator;
 import eyeofthetiger.utils.PDFUtils;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,7 +33,6 @@ public class ExportDossard extends javax.swing.JFrame {
     protected static final ResourceBundle MSGS = ResourceBundle.getBundle(MBAction.classBundleBaseName(ExportDossard.class));
     
     class ComboItem {
-        
         ComboItem(List<Participant> listParticipant, String label, String projectOrCourseName) {
             this.label = label;
             this.listParticipant = listParticipant;
@@ -59,7 +59,7 @@ public class ExportDossard extends javax.swing.JFrame {
         jComboBox.removeAllItems();
         
         for(Course c : project.getCourse()) {
-            jComboBox.insertItemAt(new ComboItem(project.getParticipants(), "Tous les participants de la course " + c.getName(), c.getName()), 0);
+            jComboBox.insertItemAt(new ComboItem(c.getParticipants(), "Tous les participants de la course " + c.getName(), c.getName()), 0);
         }
         jComboBox.insertItemAt(new ComboItem(project.getParticipants(), "Tous les participants du projet", project.getName()), 0);
         jComboBox.setSelectedIndex(0);
@@ -79,6 +79,7 @@ public class ExportDossard extends javax.swing.JFrame {
         jCheckBoxIncludeName = new javax.swing.JCheckBox();
         jCheckBoxIncludeGroup = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
+        jCheckBoxIncludeRenseignements = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -105,6 +106,11 @@ public class ExportDossard extends javax.swing.JFrame {
         jLabel1.setText(MSGS.getString("jLabel1.text")); // NOI18N
         jLabel1.setName("jLabel1"); // NOI18N
 
+        jCheckBoxIncludeRenseignements.setSelected(true);
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("gui/resources/ExportDossard"); // NOI18N
+        jCheckBoxIncludeRenseignements.setText(bundle.getString("ExportDossard.jCheckBoxIncludeRenseignements.text")); // NOI18N
+        jCheckBoxIncludeRenseignements.setName("jCheckBoxIncludeRenseignements"); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -112,11 +118,17 @@ public class ExportDossard extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBoxIncludeGroup)
-                    .addComponent(jCheckBoxIncludeName)
-                    .addComponent(jLabel1)
                     .addComponent(jComboBox, 0, 331, Short.MAX_VALUE)
-                    .addComponent(jButtonExport, javax.swing.GroupLayout.Alignment.TRAILING))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jCheckBoxIncludeGroup)
+                            .addComponent(jCheckBoxIncludeName)
+                            .addComponent(jLabel1))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jCheckBoxIncludeRenseignements)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButtonExport)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -126,13 +138,19 @@ public class ExportDossard extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
                 .addComponent(jComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jCheckBoxIncludeName)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCheckBoxIncludeGroup)
-                .addGap(18, 18, 18)
-                .addComponent(jButtonExport)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(jCheckBoxIncludeName)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jCheckBoxIncludeGroup)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jCheckBoxIncludeRenseignements)
+                        .addContainerGap(29, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButtonExport)
+                        .addContainerGap())))
         );
 
         pack();
@@ -150,10 +168,23 @@ private void jButtonExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN
         FileOutputStream out;
         try {
             out = new FileOutputStream(selectedFile);
-            PDFUtils.createPdf(((ComboItem)jComboBox.getSelectedItem()).listParticipant, jCheckBoxIncludeName.isSelected(), jCheckBoxIncludeGroup.isSelected(), out);
+            ComboItem selectedIem = ((ComboItem)jComboBox.getSelectedItem());
+            
+            PDFDossardGenerator pdfGenertor = new PDFDossardGenerator();
+            pdfGenertor.setExportName(jCheckBoxIncludeName.isSelected());
+            pdfGenertor.setExportGroup(jCheckBoxIncludeGroup.isSelected());
+            pdfGenertor.setExportRenseignement(jCheckBoxIncludeRenseignements.isSelected());
+            pdfGenertor.setMarginCm(project.getOptions().getMarginCm());
+            pdfGenertor.setLogoLeft(new File(project.getPath(),project.getOptions().getLogoLeft()).getAbsolutePath());
+            pdfGenertor.setLogoRight(new File(project.getPath(),project.getOptions().getLogoRight()).getAbsolutePath());
+            pdfGenertor.setLogoLeftWidth(project.getOptions().getLogoLeftWidth());
+            pdfGenertor.setLogoRightWidth(project.getOptions().getLogoRightWidth());
+            pdfGenertor.createPdf(selectedIem.listParticipant,out);
+            //PDFUtils.createPdf(selectedIem.listParticipant, jCheckBoxIncludeName.isSelected(), jCheckBoxIncludeGroup.isSelected(), jCheckBoxIncludeRenseignements.isSelected(), out);
             out.close();
         }
         catch(Exception e) {
+            e.printStackTrace();
             JOptionPane.showMessageDialog(this,"Erreur lors de la création du pdf des dossards: " + e.getMessage() ,"Erreur",JOptionPane.ERROR_MESSAGE);
         }        
     }
@@ -166,6 +197,7 @@ private void jButtonExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN
     private javax.swing.JButton jButtonExport;
     private javax.swing.JCheckBox jCheckBoxIncludeGroup;
     private javax.swing.JCheckBox jCheckBoxIncludeName;
+    private javax.swing.JCheckBox jCheckBoxIncludeRenseignements;
     private javax.swing.JComboBox jComboBox;
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables

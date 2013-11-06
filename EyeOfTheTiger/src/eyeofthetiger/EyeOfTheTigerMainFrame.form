@@ -59,6 +59,11 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItemNouvelleCourseActionPerformed"/>
               </Events>
             </MenuItem>
+            <Menu class="javax.swing.JMenu" name="jMenuEditCourse">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Modifier les participants"/>
+              </Properties>
+            </Menu>
             <Menu class="javax.swing.JMenu" name="jMenuDeleteCourse">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Supprimer la course ..."/>
@@ -95,6 +100,14 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItemTestCodeBarActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="jMenuItemOptionsDossards">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Options des dossards"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItemOptionsDossardsActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItemGenerateDossard">
@@ -201,7 +214,7 @@
           <SubComponents>
             <Component class="javax.swing.JTextPane" name="jTextPaneInfos">
               <Properties>
-                <Property name="contentType" type="java.lang.String" value="text/html"/>
+                <Property name="contentType" type="java.lang.String" value="text/html" noResource="true"/>
               </Properties>
             </Component>
           </SubComponents>
