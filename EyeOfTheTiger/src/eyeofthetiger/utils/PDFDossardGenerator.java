@@ -24,6 +24,7 @@ import eyeofthetiger.model.Participant;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -45,16 +46,19 @@ public class PDFDossardGenerator {
     
     public static enum SortBy {
         alphabetique {
+            @Override
             public String toString() {
                 return "Alphabétique";
             }
         },
         numero {
+            @Override
             public String toString() {
                 return "Numéro";
             }
         },
         inscriptionDate {
+            @Override
             public String toString() {
                 return "Date d'inscription";
             }
@@ -186,6 +190,7 @@ public class PDFDossardGenerator {
     
     private void sortParticipants(List<Participant> participants) {
         Comparator<Participant> comparator = new Comparator<Participant>() {
+            @Override
             public int compare(Participant o1, Participant o2) {
                 if(o1 == o2) {return 0;}
                 if(o1 == null) {return 1;}
@@ -203,6 +208,7 @@ public class PDFDossardGenerator {
                 break;
             case inscriptionDate:
                 comparator = new Comparator<Participant>() {
+                    @Override
                     public int compare(Participant o1, Participant o2) {
                         if(o1 == o2) {return 0;}
                         if(o1 == null || o1.getDateInscription() == null) {return 1;}
@@ -214,6 +220,7 @@ public class PDFDossardGenerator {
             case numero:
                 comparator = new Comparator<Participant>() {
                     AlphanumComparator ac = new eyeofthetiger.utils.AlphanumComparator();
+                    @Override
                     public int compare(Participant o1, Participant o2) {
                         if(o1 == o2) {return 0;}
                         if(o1 == null || o1.getNumero() == null) {return 1;}
@@ -223,7 +230,7 @@ public class PDFDossardGenerator {
                 };    
                 break;
         }
-        participants.sort(comparator);
+        Collections.sort(participants, comparator);
     }
 
     

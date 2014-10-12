@@ -6,12 +6,12 @@
         <group>
             <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/utils/PDFDossardGenerator.java</file>
             <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/gui/DialogCreateOrEditCourse.java</file>
-            <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/model/Options.java</file>
+            <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/utils/DateToStringConverter.java</file>
+            <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/utils/AlphanumComparator.java</file>
             <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/EyeOfTheTigerMainFrame.java</file>
             <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/gui/ImportParticipantWizard.java</file>
+            <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/gui/ProjectView.java</file>
             <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/gui/ExportDossard.java</file>
-            <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/gui/ImportParticipantWizardOld.java</file>
-            <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/gui/DialogCreateNewProject.java</file>
             <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/EyeOfTheTiger.java</file>
             <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/gui/DossardDesignPanel.java</file>
             <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/todo.txt</file>
