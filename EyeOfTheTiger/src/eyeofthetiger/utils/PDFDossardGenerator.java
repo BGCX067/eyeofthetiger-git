@@ -17,11 +17,14 @@ import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.Barcode128;
 import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfImportedPage;
+import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfWriter;
 import eyeofthetiger.model.Participant;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -40,6 +43,25 @@ public class PDFDossardGenerator {
     }
     
     
+    public static enum SortBy {
+        alphabetique {
+            public String toString() {
+                return "Alphabétique";
+            }
+        },
+        numero {
+            public String toString() {
+                return "Numéro";
+            }
+        },
+        inscriptionDate {
+            public String toString() {
+                return "Date d'inscription";
+            }
+        }
+    }
+    
+    
     public PDFDossardGenerator() {
         
     }
@@ -55,6 +77,8 @@ public class PDFDossardGenerator {
     
     private String logoLeft = "";
     private String logoRight = "";
+    
+    private SortBy sortBy = SortBy.alphabetique;
 
     public boolean isExportName() {
         return exportName;
@@ -122,9 +146,20 @@ public class PDFDossardGenerator {
     public float getLogoRightWidht() {
         return logoRightWidth;
     }
+    public void setSortBy(SortBy sb) {
+        sortBy = sb;
+    }
+    public SortBy getSortBy() {
+        return sortBy;
+    }
     
-    
-    
+    private String pdfBackground = null;
+    public String getPdfBackground() {
+        return pdfBackground;
+    }
+    public void setPdfBackground(String pdfPath) {
+        pdfBackground = pdfPath;
+    }
     
     private Phrase createCleanPhrase(String txt1, float fontSize1, boolean bold1) {
         Phrase phrase = new Phrase(txt1);
@@ -147,15 +182,69 @@ public class PDFDossardGenerator {
         barcodeImage.scaleToFit(width, height);
         return barcodeImage;        
     }
-    
 
+    
+    private void sortParticipants(List<Participant> participants) {
+        Comparator<Participant> comparator = new Comparator<Participant>() {
+            public int compare(Participant o1, Participant o2) {
+                if(o1 == o2) {return 0;}
+                if(o1 == null) {return 1;}
+                if(o2 == null) {return -1;}
+                int i = ("" + o1.getNom()).compareToIgnoreCase(""+o2.getNom());
+                if( i == 0) {
+                    i = ("" + o1.getPrenom()).compareToIgnoreCase(""+o2.getPrenom());
+                }
+                return i;
+            }
+        };
+        switch(sortBy) {
+            case alphabetique:
+                //default created above
+                break;
+            case inscriptionDate:
+                comparator = new Comparator<Participant>() {
+                    public int compare(Participant o1, Participant o2) {
+                        if(o1 == o2) {return 0;}
+                        if(o1 == null || o1.getDateInscription() == null) {return 1;}
+                        if(o2 == null || o2.getDateInscription() == null) {return -1;}
+                        return o1.getDateInscription().compareTo(o2.getDateInscription());
+                    }
+                };
+                break;
+            case numero:
+                comparator = new Comparator<Participant>() {
+                    AlphanumComparator ac = new eyeofthetiger.utils.AlphanumComparator();
+                    public int compare(Participant o1, Participant o2) {
+                        if(o1 == o2) {return 0;}
+                        if(o1 == null || o1.getNumero() == null) {return 1;}
+                        if(o2 == null || o2.getNumero() == null) {return -1;}
+                        return ac.compare(o1.getNumero(), o2.getNumero());
+                    }
+                };    
+                break;
+        }
+        participants.sort(comparator);
+    }
+
+    
+    //http://itextpdf.com/examples/iia.php?id=113
+    
     public void createPdf(List<Participant> participants, OutputStream out) throws IOException, DocumentException {
+        sortParticipants(participants);
+                
         Document document = new Document(PageSize.A4.rotate());
         float margin = CentimeterToUserSpace(marginCm);
         document.setMargins(margin,margin,margin,margin);
         PdfWriter writer = PdfWriter.getInstance(document, out);
         document.open();
         PdfContentByte cb = writer.getDirectContent();
+        
+        PdfReader pdfBackgroundReader = null;
+        PdfImportedPage backgroundPage = null;
+        if(pdfBackground != null && (new File(pdfBackground)).exists() && (new File(pdfBackground)).isFile()) {
+            pdfBackgroundReader = new PdfReader(pdfBackground);
+            backgroundPage = writer.getImportedPage(pdfBackgroundReader, 1);
+        }
         
         float documentTop = document.top();
         float documentBottom = document.bottom();
@@ -232,6 +321,12 @@ public class PDFDossardGenerator {
         
         for(Participant participant : participants) {
 
+            if(backgroundPage != null) {
+                //cb.addTemplate(backgroundPage, 1f, 0, 0, 1, 0, 0); //TODO
+                cb.addTemplate(backgroundPage, 0,0);
+            }
+            
+            
             float nameFontSize = 65f;
             float groupFontSize = 45f;
             float renseignementFontSize = 35f;
@@ -362,6 +457,10 @@ public class PDFDossardGenerator {
                    
         }
        
-        document.close();        
+        document.close(); 
+        
+        if(pdfBackgroundReader != null) {
+            pdfBackgroundReader.close();
+        }
     }  
 }

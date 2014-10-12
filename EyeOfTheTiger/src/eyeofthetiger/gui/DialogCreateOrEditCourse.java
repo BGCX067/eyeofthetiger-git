@@ -13,6 +13,7 @@ package eyeofthetiger.gui;
 import eyeofthetiger.model.Course;
 import eyeofthetiger.model.Participant;
 import eyeofthetiger.model.Project;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -53,6 +54,8 @@ public class DialogCreateOrEditCourse extends javax.swing.JDialog {
         leftParticipants.addAll(project.getParticipants());
         
         initComponents();
+        
+        jLabelError.setBackground(new Color(255,204,204));
         
         if(course == null) {
             jTextFieldNom.getDocument().addDocumentListener(new DocumentListener() {
@@ -106,6 +109,16 @@ public class DialogCreateOrEditCourse extends javax.swing.JDialog {
 
     private boolean check() {
         if(course == null) {
+            
+            String name = getNomCourse();
+            for (int i=0;i<name.length();++i) {
+                char c = name.charAt(i);
+                if (!Character.isLetterOrDigit(c) && c != '_' && c!='-') {
+                    error("Seule les lettres, chiffres et symboles '-' ou '_' sont autorisés");
+                    return false;
+                }
+            }
+            
             File f = new File(project.getPath(),getNomCourse());
             if(f.exists()) {
                 error("Course déja existante !");

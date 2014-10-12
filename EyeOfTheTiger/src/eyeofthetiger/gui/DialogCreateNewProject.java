@@ -10,6 +10,7 @@
  */
 package eyeofthetiger.gui;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -43,6 +44,8 @@ public class DialogCreateNewProject extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
 
+        jLabelError.setBackground(new Color(255,204,204));
+        
         jTextFieldName.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
                 check();
@@ -61,7 +64,6 @@ public class DialogCreateNewProject extends javax.swing.JDialog {
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelName);
         ActionMap actionMap = getRootPane().getActionMap();
         actionMap.put(cancelName, new AbstractAction() {
-
             public void actionPerformed(ActionEvent e) {
                 doClose(RET_CANCEL);
             }
@@ -89,6 +91,14 @@ public class DialogCreateNewProject extends javax.swing.JDialog {
     
     private boolean check() {
         String name = getName();
+        
+        for (int i=0;i<name.length();++i) {
+            char c = name.charAt(i);
+            if (!Character.isLetterOrDigit(c) && c != '_' && c!='-') {
+                error("Seule les lettres, chiffres et symboles '-' ou '_' sont autorisés");
+                return false;
+            }
+        }
         
         if(name.isEmpty()) {
             error("Nom de projet vide");
@@ -183,6 +193,7 @@ public class DialogCreateNewProject extends javax.swing.JDialog {
         jLabelError.setBackground(new java.awt.Color(0, 0, 0));
         jLabelError.setText(MSGS.getString("jLabelError.text")); // NOI18N
         jLabelError.setName("jLabelError"); // NOI18N
+        jLabelError.setOpaque(true);
         jPanel1.add(jLabelError, java.awt.BorderLayout.PAGE_START);
 
         jPanel2.setName("jPanel2"); // NOI18N
@@ -248,12 +259,12 @@ public class DialogCreateNewProject extends javax.swing.JDialog {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(399, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(okButton, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cancelButton)
-                .addContainerGap())
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
+                .addGap(6, 6, 6))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 743, Short.MAX_VALUE)
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {cancelButton, okButton});
@@ -261,8 +272,8 @@ public class DialogCreateNewProject extends javax.swing.JDialog {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cancelButton)
                     .addComponent(okButton))

@@ -349,11 +349,8 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_saveProjectMenuItemActionPerformed
 
     private void jMenuItemGenerateDossardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGenerateDossardActionPerformed
-        if(currectProject != null) {
-            ExportDossard frame = new ExportDossard(currectProject);
-            frame.setLocationByPlatform(true);
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
+        if(currectProjectView != null) {
+            currectProjectView.exportDossardAction();
         }
     }//GEN-LAST:event_jMenuItemGenerateDossardActionPerformed
 
@@ -420,6 +417,7 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
             pdfGenertor.setMarginCm(currectProject.getOptions().getMarginCm());
             pdfGenertor.setLogoLeft(new File(currectProject.getPath(),currectProject.getOptions().getLogoLeft()).getAbsolutePath());
             pdfGenertor.setLogoRight(new File(currectProject.getPath(),currectProject.getOptions().getLogoRight()).getAbsolutePath());
+            pdfGenertor.setPdfBackground(new File(currectProject.getPath(),currectProject.getOptions().getPdfBackground()).getAbsolutePath());
             pdfGenertor.setLogoLeftWidth(currectProject.getOptions().getLogoLeftWidth());
             pdfGenertor.setLogoRightWidth(currectProject.getOptions().getLogoRightWidth());
             DossardDesignPanel ddp = new DossardDesignPanel();
@@ -455,6 +453,18 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
                         }
                         else {
                             currectProject.getOptions().setLogoRight("");
+                        }
+                    }
+                    oldFile = new File(currectProject.getPath(),currectProject.getOptions().getPdfBackground());
+                    newFile = new File(pdfGenertor.getPdfBackground());
+                    if(!oldFile.equals(newFile)) {
+                        if(newFile.exists() && newFile.isFile()) {
+                            File copyNewFile = new File(currectProject.getPath(),newFile.getName());
+                            eyeofthetiger.utils.Utils.CopyFile(newFile, copyNewFile);
+                            currectProject.getOptions().setPdfBackground(copyNewFile.getName());
+                        }
+                        else {
+                            currectProject.getOptions().setPdfBackground("");
                         }
                     }
                     

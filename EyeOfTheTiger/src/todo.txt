@@ -1,4 +1,6 @@
 - Explication sur le format de sauvegarde
 
 - Ajouter la possibilité d'un logo pour les dossards et un texte fixe
+- Ajouter un "fond" sur les dossards
 - Export XLS des courses depuis un menu
+- Tris lors de l'export PDF des dossards

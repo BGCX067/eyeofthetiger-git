@@ -14,10 +14,15 @@ import eyeofthetiger.model.Course;
 import eyeofthetiger.model.Participant;
 import eyeofthetiger.model.Project;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
+import javax.swing.AbstractAction;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
@@ -50,6 +55,21 @@ public class ProjectView extends javax.swing.JPanel {
                 projectDatasChanged();
             }
         });
+        
+        JPopupMenu menu = new JPopupMenu();
+        JMenuItem item = new JMenuItem(new AbstractAction("Supprimer les participants sélectionné") {
+            public void actionPerformed(ActionEvent e) {
+                deleteParticipantsAction();
+            }           
+        });
+        menu.add(item);
+        item = new JMenuItem(new AbstractAction("Générer les dossard des participants sélectionné") {
+            public void actionPerformed(ActionEvent e) {
+                exportDossardAction();
+            } 
+        });
+        menu.add(item);
+        jTableParticipants.setComponentPopupMenu(menu);
         
         
         jTabbedPane1.setTitleAt(0, "Projet: " + project.getName());
@@ -216,18 +236,34 @@ public class ProjectView extends javax.swing.JPanel {
     
     
 private void jTableParticipantsKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTableParticipantsKeyPressed
-    if(evt.getKeyCode() == KeyEvent.VK_DELETE) {
-        jTableParticipants.setUpdateSelectionOnSort(false);
-        
-        List<Participant> list = new LinkedList<Participant>(participantSelection);
-        project.getParticipants().removeAll(list);
-        
-        jTableParticipants.setUpdateSelectionOnSort(true);
-        jTableParticipants.getSelectionModel().clearSelection();
-        
+    if(evt.getKeyCode() == KeyEvent.VK_DELETE && getParticipantSelection() != null && getParticipantSelection().size()>0) {
+        deleteParticipantsAction();
         evt.consume();
     }
 }//GEN-LAST:event_jTableParticipantsKeyPressed
+
+public void exportDossardAction() {
+    if(project != null) {
+        ExportDossard frame = new ExportDossard(project,getParticipantSelection());
+        frame.setLocationByPlatform(true);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+}
+
+private void deleteParticipantsAction() {
+    if(getParticipantSelection() != null && getParticipantSelection().size()>0) {
+        if(JOptionPane.showConfirmDialog(this, "Souhaitez vous réélement supprimer ces participants ?", "Supprimer des participants", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+            jTableParticipants.setUpdateSelectionOnSort(false);
+
+            List<Participant> list = new LinkedList<Participant>(getParticipantSelection());
+            project.getParticipants().removeAll(list);
+
+            jTableParticipants.setUpdateSelectionOnSort(true);
+            jTableParticipants.getSelectionModel().clearSelection();
+        }    
+    }
+}
 
 private void jButtonImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonImportActionPerformed
     ImportParticipantWizard wizard = new ImportParticipantWizard();

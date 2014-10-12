@@ -2,4 +2,20 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1"/>
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/utils/PDFDossardGenerator.java</file>
+            <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/gui/DialogCreateOrEditCourse.java</file>
+            <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/model/Options.java</file>
+            <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/EyeOfTheTigerMainFrame.java</file>
+            <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/gui/ImportParticipantWizard.java</file>
+            <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/gui/ExportDossard.java</file>
+            <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/gui/ImportParticipantWizardOld.java</file>
+            <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/gui/DialogCreateNewProject.java</file>
+            <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/EyeOfTheTiger.java</file>
+            <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/gui/DossardDesignPanel.java</file>
+            <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/todo.txt</file>
+            <file>file:/home/thecat/devel/Java/eyeofthetiger/EyeOfTheTiger/src/eyeofthetiger/model/Project.java</file>
+        </group>
+    </open-files>
 </project-private>

@@ -68,8 +68,10 @@ public class DossardDesignPanel extends javax.swing.JPanel {
         jLabelLogoRightWidth.setText("Largeur:" + rightWidth + "%");
         File logoLeft = new File(pdfDossardGenerator.getLogoLeft());
         File logoRight = new File(pdfDossardGenerator.getLogoRight());
+        File pdfBackground = new File(pdfDossardGenerator.getPdfBackground());
         jTextFieldLogoLeft.setText((logoLeft.exists() && logoLeft.isFile()) ? pdfDossardGenerator.getLogoLeft() : "");
         jTextFieldLogoRight.setText((logoRight.exists() && logoRight.isFile()) ? pdfDossardGenerator.getLogoRight() : "");
+        jTextFieldBackgroundPdf.setText((pdfBackground.exists() && pdfBackground.isFile()) ? pdfDossardGenerator.getPdfBackground() : "");
         
         if(participants.isEmpty()) {
             Participant p = new Participant();
@@ -147,6 +149,9 @@ public class DossardDesignPanel extends javax.swing.JPanel {
         jSliderLogoRight = new javax.swing.JSlider();
         jLabelLogoLeftWidth = new javax.swing.JLabel();
         jLabelLogoRightWidth = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jTextFieldBackgroundPdf = new javax.swing.JTextField();
+        jButtonBackgroundPdfBrowse = new javax.swing.JButton();
 
         jButtonPrevious.setIcon(new javax.swing.ImageIcon(getClass().getResource("/eyeofthetiger/gui/resources/gnome-go-previous_32x32.png"))); // NOI18N
         jButtonPrevious.setText("Participant précédent");
@@ -165,6 +170,8 @@ public class DossardDesignPanel extends javax.swing.JPanel {
             }
         });
 
+        jPanelImage.setBorder(javax.swing.BorderFactory.createTitledBorder("Résultat"));
+
         javax.swing.GroupLayout jPanelImageLayout = new javax.swing.GroupLayout(jPanelImage);
         jPanelImage.setLayout(jPanelImageLayout);
         jPanelImageLayout.setHorizontalGroup(
@@ -173,8 +180,10 @@ public class DossardDesignPanel extends javax.swing.JPanel {
         );
         jPanelImageLayout.setVerticalGroup(
             jPanelImageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 215, Short.MAX_VALUE)
+            .addGap(0, 338, Short.MAX_VALUE)
         );
+
+        jPanelOptions.setBorder(javax.swing.BorderFactory.createTitledBorder("Options"));
 
         jLabel2.setText("Logo gauche:");
 
@@ -247,69 +256,88 @@ public class DossardDesignPanel extends javax.swing.JPanel {
 
         jLabelLogoRightWidth.setText("Largeur:20%");
 
+        jLabel5.setText("PDF de fond:");
+
+        jTextFieldBackgroundPdf.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextFieldBackgroundPdfActionPerformed(evt);
+            }
+        });
+
+        jButtonBackgroundPdfBrowse.setText("...");
+        jButtonBackgroundPdfBrowse.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonBackgroundPdfBrowseActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanelOptionsLayout = new javax.swing.GroupLayout(jPanelOptions);
         jPanelOptions.setLayout(jPanelOptionsLayout);
         jPanelOptionsLayout.setHorizontalGroup(
             jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelOptionsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanelOptionsLayout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextFieldMargin, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel4))
+                .addGroup(jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelOptionsLayout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextFieldBackgroundPdf, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanelOptionsLayout.createSequentialGroup()
                         .addGroup(jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
                             .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelOptionsLayout.createSequentialGroup()
-                                .addComponent(jTextFieldLogoRight, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButtonLogoRight))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelOptionsLayout.createSequentialGroup()
-                                .addComponent(jTextFieldLogoLeft, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButtonLogoLeft)))))
+                            .addComponent(jTextFieldLogoLeft)
+                            .addComponent(jTextFieldLogoRight))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jButtonLogoLeft, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButtonBackgroundPdfBrowse, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButtonLogoRight, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabelLogoRightWidth)
-                    .addComponent(jLabelLogoLeftWidth))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSliderLogoLeft, javax.swing.GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE)
-                    .addComponent(jSliderLogoRight, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(jPanelOptionsLayout.createSequentialGroup()
+                        .addGroup(jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabelLogoLeftWidth)
+                            .addComponent(jLabelLogoRightWidth))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jSliderLogoRight, javax.swing.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
+                            .addComponent(jSliderLogoLeft, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(jPanelOptionsLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextFieldMargin, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel4))))
         );
         jPanelOptionsLayout.setVerticalGroup(
             jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelOptionsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(jTextFieldBackgroundPdf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonBackgroundPdfBrowse)
+                    .addComponent(jLabel1)
+                    .addComponent(jTextFieldMargin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jButtonLogoRight)
-                        .addComponent(jTextFieldLogoRight, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel2)
+                        .addComponent(jButtonLogoLeft)
+                        .addComponent(jTextFieldLogoLeft, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabelLogoLeftWidth))
+                    .addComponent(jSliderLogoLeft, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel3)
+                        .addComponent(jTextFieldLogoRight, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButtonLogoRight)
                         .addComponent(jLabelLogoRightWidth))
-                    .addGroup(jPanelOptionsLayout.createSequentialGroup()
-                        .addGroup(jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanelOptionsLayout.createSequentialGroup()
-                                .addGroup(jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel1)
-                                    .addComponent(jTextFieldMargin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel4))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanelOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jTextFieldLogoLeft, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jButtonLogoLeft)
-                                    .addComponent(jLabelLogoLeftWidth)))
-                            .addComponent(jSliderLogoLeft, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSliderLogoRight, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jSliderLogoRight, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -430,8 +458,33 @@ public class DossardDesignPanel extends javax.swing.JPanel {
         refreshDisplay();
     }//GEN-LAST:event_jTextFieldLogoRightActionPerformed
 
+    private void jTextFieldBackgroundPdfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldBackgroundPdfActionPerformed
+        File file = new File(jTextFieldBackgroundPdf.getText().trim());
+        String filePath = file.getAbsolutePath();
+        if(!file.exists()  || !file.isFile()){
+            filePath = "";
+        }
+        pdfDossardGenerator.setPdfBackground(filePath);
+        refreshDisplay();
+    }//GEN-LAST:event_jTextFieldBackgroundPdfActionPerformed
+
+    private void jButtonBackgroundPdfBrowseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonBackgroundPdfBrowseActionPerformed
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+           String filePath = chooser.getSelectedFile().getAbsolutePath();
+           if(!chooser.getSelectedFile().exists()  || !chooser.getSelectedFile().isFile()){
+               filePath = "";
+           }
+           pdfDossardGenerator.setPdfBackground(filePath);
+           refreshDisplay();
+        }
+    }//GEN-LAST:event_jButtonBackgroundPdfBrowseActionPerformed
+   
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonBackgroundPdfBrowse;
     private javax.swing.JButton jButtonLogoLeft;
     private javax.swing.JButton jButtonLogoRight;
     private javax.swing.JButton jButtonNext;
@@ -440,12 +493,14 @@ public class DossardDesignPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabelLogoLeftWidth;
     private javax.swing.JLabel jLabelLogoRightWidth;
     private javax.swing.JPanel jPanelImage;
     private javax.swing.JPanel jPanelOptions;
     private javax.swing.JSlider jSliderLogoLeft;
     private javax.swing.JSlider jSliderLogoRight;
+    private javax.swing.JTextField jTextFieldBackgroundPdf;
     private javax.swing.JTextField jTextFieldLogoLeft;
     private javax.swing.JTextField jTextFieldLogoRight;
     private javax.swing.JTextField jTextFieldMargin;

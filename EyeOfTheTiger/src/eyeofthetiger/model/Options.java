@@ -14,6 +14,7 @@ public class Options implements Serializable {
     private float marginCm = 0.5f;
     private String logoLeft = "";
     private String logoRight = "";
+    private String pdfBackground = "";
     private float logoLeftWidth = 0.2f;
     private float logoRightWidth = 0.2f;
 
@@ -57,6 +58,12 @@ public class Options implements Serializable {
         this.logoRightWidth = logoRightWidth;
     }
     
+    public void setPdfBackground(String file) {
+        pdfBackground = file;
+    }
+    public String getPdfBackground() {
+        return pdfBackground;
+    }
     
     
 }
