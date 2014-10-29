@@ -1,6 +1,16 @@
 - Explication sur le format de sauvegarde
 
-- Ajouter la possibilité d'un logo pour les dossards et un texte fixe
-- Ajouter un "fond" sur les dossards
++ Tris des participants la première fois (sans selection) bug
++ Ouvrir un PDF devrait demander un fichier *.PDF
++ Ouvrir une image devrait demander un fichier image
++ Le menu contextuel "supprimer la course" est trop proche d'un autre bouton
++ La suppression d'une course demande confirmation
++ Menu contextuel: ajouter un separateur
++ Définir le repertoire d'ouverture de projet sur "Mes Documents"
++ Centrer les fenètres d'options
++ Tris des participants par groupe et renseignements
++ Tris des participants (+ tris des dossards): mettre les "blancs" (participants null) à la fin
+- L'export XLS des course affiche parfois "01:3:30"
+- Ajouter de la documentation
+- Ajouter des "balloontooltip"
 - Export XLS des courses depuis un menu
-- Tris lors de l'export PDF des dossards

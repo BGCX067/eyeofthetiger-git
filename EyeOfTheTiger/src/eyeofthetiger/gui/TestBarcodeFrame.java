@@ -67,6 +67,7 @@ public class TestBarcodeFrame extends javax.swing.JFrame {
         jPanelTest2Inner.add(getTest2());
         
         jTextFieldCode.setFont(Utils.BigFont);
+        eyeofthetiger.gui.Utils.BalloonHelp("<html><p width='200px'>Donnez le focus pour faire fonctionner le lecteur de code barre.<br/> Le champs devient alors violet.</p></html>", jTextFieldCode);
         
         TableRowSorter<TableModel> sorterCourseParticipants = new TableRowSorter<TableModel>(jTableParticipant.getModel());
         jTableParticipant.setRowSorter(sorterCourseParticipants);

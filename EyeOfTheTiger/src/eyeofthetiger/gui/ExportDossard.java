@@ -75,6 +75,8 @@ public class ExportDossard extends javax.swing.JFrame {
         jComboBoxSortBy.addItem(SortBy.alphabetique);
         jComboBoxSortBy.addItem(SortBy.inscriptionDate);
         jComboBoxSortBy.addItem(SortBy.numero);
+        jComboBoxSortBy.addItem(SortBy.groupe);
+        jComboBoxSortBy.addItem(SortBy.renseignement);
         jComboBoxSortBy.setSelectedItem(lastSortByChoice);
     }
 

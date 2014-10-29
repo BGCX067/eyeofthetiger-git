@@ -5,7 +5,6 @@
 package eyeofthetiger.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
@@ -13,14 +12,22 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileSystemView;
+import net.java.balloontip.BalloonTip;
+import net.java.balloontip.utils.FadingUtils;
+import net.java.balloontip.utils.ToolTipUtils;
 
 /**
  * Some utility functions.
@@ -203,11 +210,17 @@ public class Utils {
     public static boolean ShowOkCancelDialog(Frame parent,String title, JPanel panel,Dimension size) {
         final boolean b[] = new boolean[] {false};
         final JDialog dlg = new JDialog(parent, title);
+        if(size != null) {
+            dlg.setSize(size);
+        }
+        dlg.setLocationByPlatform(true);
+        dlg.setLocationRelativeTo(parent);
         dlg.getContentPane().setLayout(new BorderLayout());
         JPanel okCancelPanel = new JPanel();
         okCancelPanel.setLayout(new FlowLayout());
         JButton ok = new JButton("Ok");
         ok.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 b[0] = true;
                 dlg.setVisible(false);
@@ -215,6 +228,7 @@ public class Utils {
         });
         JButton cancel = new JButton("Annuler");
         cancel.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 b[0] = false;
                 dlg.setVisible(false);
@@ -233,4 +247,60 @@ public class Utils {
         return b[0];
     }
     
+    
+    public static void BalloonHelp(String msg, JComponent ... components) {
+        for(JComponent c : components) {
+            BalloonTip myBalloonTip = new BalloonTip(c, msg);
+            FadingUtils.fadeInBalloon(myBalloonTip, null, 500, 24);
+            myBalloonTip.setCloseButton(null);
+            ToolTipUtils.balloonToToolTip(myBalloonTip, 500, 15000); 
+        }
+    }
+    
+    
+    
+    public static File GetMyDocumentsFolder() {
+         JFileChooser fr = new JFileChooser();
+         FileSystemView fw = fr.getFileSystemView();
+         return fw.getDefaultDirectory();
+    }
+
+    
+    public static FileFilter PDF_FILE_FILTER = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                if(f!=null) {
+                    return f.getName().toLowerCase().endsWith(".pdf");
+                }
+                return false;
+            }
+
+            @Override
+            public String getDescription() {
+               return "Fichier PDF";
+            }
+        };
+    
+    public static FileFilter IMAGE_FILE_FILTER = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                if(f!=null) {
+                    String fileName = f.getName().toLowerCase();
+                    if(fileName.endsWith(".jpg") 
+                       || fileName.endsWith(".jpeg")
+                       || fileName.endsWith(".png")
+                       || fileName.endsWith(".gif")
+                       || fileName.endsWith(".bmp")) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public String getDescription() {
+               return "Fichier image (png,jpg,gif,bmp)";
+            }
+        };    
+
 }

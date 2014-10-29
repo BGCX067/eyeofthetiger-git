@@ -8,7 +8,6 @@ import com.jgoodies.looks.LookUtils;
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
 import eyeofthetiger.gui.DialogCreateNewProject;
 import eyeofthetiger.gui.DossardDesignPanel;
-import eyeofthetiger.gui.ExportDossard;
 import eyeofthetiger.gui.ProjectView;
 import eyeofthetiger.gui.TestBarcodeFrame;
 import eyeofthetiger.gui.Utils;
@@ -30,6 +29,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.text.Caret;
+import javax.swing.text.DefaultCaret;
 
 /**
  *
@@ -59,7 +60,12 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
         
         jTextPaneInfos.setContentType("text/html");
         jTextPaneInfos.setEditable(false);
-        jTextPaneInfos.setText(InfoHTML());        
+        Caret caret = jTextPaneInfos.getCaret();
+        if(caret instanceof DefaultCaret) {
+            DefaultCaret dcaret = (DefaultCaret) caret;
+            dcaret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+        }
+        jTextPaneInfos.setText(InfoHTML());
     }
 
     
@@ -103,16 +109,19 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
         newProjectMenuItem = new javax.swing.JMenuItem();
         loadProjectMenuItem = new javax.swing.JMenuItem();
         saveProjectMenuItem = new javax.swing.JMenuItem();
-        jSeparator2 = new javax.swing.JPopupMenu.Separator();
-        jMenuItemNouvelleCourse = new javax.swing.JMenuItem();
-        jMenuEditCourse = new javax.swing.JMenu();
-        jMenuDeleteCourse = new javax.swing.JMenu();
         jSeparator3 = new javax.swing.JPopupMenu.Separator();
         exitMenuItem = new javax.swing.JMenuItem();
+        jMenuCourses = new javax.swing.JMenu();
+        jMenuItemNouvelleCourse = new javax.swing.JMenuItem();
+        jSeparator6 = new javax.swing.JPopupMenu.Separator();
+        jMenuEditCourse = new javax.swing.JMenu();
+        jSeparator5 = new javax.swing.JPopupMenu.Separator();
+        jMenuDeleteCourse = new javax.swing.JMenu();
         helpMenu = new javax.swing.JMenu();
-        jMenuItemTestCodeBar = new javax.swing.JMenuItem();
         jMenuItemOptionsDossards = new javax.swing.JMenuItem();
         jMenuItemGenerateDossard = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
+        jMenuItemTestCodeBar = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         aboutMenuItem = new javax.swing.JMenuItem();
 
@@ -216,30 +225,6 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
             }
         });
         fileMenu.add(saveProjectMenuItem);
-        fileMenu.add(jSeparator2);
-
-        jMenuItemNouvelleCourse.setText("Nouvelle course");
-        jMenuItemNouvelleCourse.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemNouvelleCourseActionPerformed(evt);
-            }
-        });
-        fileMenu.add(jMenuItemNouvelleCourse);
-
-        jMenuEditCourse.setText("Modifier les participants");
-        fileMenu.add(jMenuEditCourse);
-
-        jMenuDeleteCourse.setText("Supprimer la course ...");
-        jMenuDeleteCourse.addMenuListener(new javax.swing.event.MenuListener() {
-            public void menuCanceled(javax.swing.event.MenuEvent evt) {
-            }
-            public void menuDeselected(javax.swing.event.MenuEvent evt) {
-            }
-            public void menuSelected(javax.swing.event.MenuEvent evt) {
-                jMenuDeleteCourseMenuSelected(evt);
-            }
-        });
-        fileMenu.add(jMenuDeleteCourse);
         fileMenu.add(jSeparator3);
 
         exitMenuItem.setMnemonic('x');
@@ -253,6 +238,44 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
 
         menuBar.add(fileMenu);
 
+        jMenuCourses.setText("Courses");
+        jMenuCourses.addMenuListener(new javax.swing.event.MenuListener() {
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuDeselected(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+                jMenuCoursesMenuSelected(evt);
+            }
+        });
+
+        jMenuItemNouvelleCourse.setText("Nouvelle course");
+        jMenuItemNouvelleCourse.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemNouvelleCourseActionPerformed(evt);
+            }
+        });
+        jMenuCourses.add(jMenuItemNouvelleCourse);
+        jMenuCourses.add(jSeparator6);
+
+        jMenuEditCourse.setText("Modifier les participants");
+        jMenuCourses.add(jMenuEditCourse);
+        jMenuCourses.add(jSeparator5);
+
+        jMenuDeleteCourse.setText("Supprimer la course ...");
+        jMenuDeleteCourse.addMenuListener(new javax.swing.event.MenuListener() {
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuDeselected(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+                jMenuDeleteCourseMenuSelected(evt);
+            }
+        });
+        jMenuCourses.add(jMenuDeleteCourse);
+
+        menuBar.add(jMenuCourses);
+
         helpMenu.setMnemonic('h');
         helpMenu.setText("Outils");
         helpMenu.addMenuListener(new javax.swing.event.MenuListener() {
@@ -264,14 +287,6 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
                 helpMenuMenuSelected(evt);
             }
         });
-
-        jMenuItemTestCodeBar.setText("Tester le lecteur de code barre");
-        jMenuItemTestCodeBar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemTestCodeBarActionPerformed(evt);
-            }
-        });
-        helpMenu.add(jMenuItemTestCodeBar);
 
         jMenuItemOptionsDossards.setText("Options des dossards");
         jMenuItemOptionsDossards.addActionListener(new java.awt.event.ActionListener() {
@@ -288,10 +303,19 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
             }
         });
         helpMenu.add(jMenuItemGenerateDossard);
+        helpMenu.add(jSeparator2);
+
+        jMenuItemTestCodeBar.setText("Tester le lecteur de code barre");
+        jMenuItemTestCodeBar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemTestCodeBarActionPerformed(evt);
+            }
+        });
+        helpMenu.add(jMenuItemTestCodeBar);
         helpMenu.add(jSeparator1);
 
         aboutMenuItem.setMnemonic('a');
-        aboutMenuItem.setText("About");
+        aboutMenuItem.setText("A propos ...");
         aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 aboutMenuItemActionPerformed(evt);
@@ -398,7 +422,6 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
         else {
             saveProjectMenuItem.setEnabled(true);
         }
-        manageCourseMenuItems();
     }//GEN-LAST:event_fileMenuMenuSelected
 
     private void jMenuItemNouvelleCourseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemNouvelleCourseActionPerformed
@@ -478,6 +501,10 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jMenuItemOptionsDossardsActionPerformed
 
+    private void jMenuCoursesMenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_jMenuCoursesMenuSelected
+        manageCourseMenuItems();
+    }//GEN-LAST:event_jMenuCoursesMenuSelected
+
  
     private void newProject() {
         DialogCreateNewProject dlg = new DialogCreateNewProject(this, true);
@@ -492,6 +519,7 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
     
     private void loadProject() {
         JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(Utils.GetMyDocumentsFolder());
         fileChooser.addChoosableFileFilter(new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -510,7 +538,7 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
                 return "Charger un projet";
             }
         });
-        fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+        fileChooser.setCurrentDirectory(Utils.GetMyDocumentsFolder());
         //fileChooser.setCurrentDirectory(new File("E:\\devel\\EyeOfTheTigerApp\\Projets"));
         fileChooser.setDialogTitle("Choisissez le répertoire d'un projet");
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -532,6 +560,8 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
     
     private void testCodeBarre() {
         TestBarcodeFrame f = new TestBarcodeFrame(currectProject);
+        f.setLocationByPlatform(true);
+        f.setLocationRelativeTo(this);
         f.pack();
         f.setVisible(true);        
     }
@@ -553,11 +583,17 @@ private void manageCourseMenuItems() {
         jMenuEditCourse.setEnabled(true);
         for(final Course c : currectProject.getCourse()) {
             JMenuItem itemDelete = new JMenuItem(new AbstractAction(c.getName()) {
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         try {
-                            currectProject.deleteCourse(c);
-                            if(currectProjectView != null) {
-                                currectProjectView.removeCourseView(c);
+                            if(JOptionPane.showConfirmDialog(null 
+                                                            , "Etes-vous certains de vouloir\nsupprimer la course\n'" + c.getName() + "' ?"
+                                                            , "Suppression de la course '" + c.getName() + "'"
+                                                            , JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                                currectProject.deleteCourse(c);
+                                if(currectProjectView != null) {
+                                    currectProjectView.removeCourseView(c);
+                                }
                             }
                         }
                         catch(Exception ex) {
@@ -659,6 +695,7 @@ private void manageCourseMenuItems() {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JMenu jMenuCourses;
     private javax.swing.JMenu jMenuDeleteCourse;
     private javax.swing.JMenu jMenuEditCourse;
     private javax.swing.JMenuItem jMenuItemGenerateDossard;
@@ -669,6 +706,8 @@ private void manageCourseMenuItems() {
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
+    private javax.swing.JPopupMenu.Separator jSeparator5;
+    private javax.swing.JPopupMenu.Separator jSeparator6;
     private javax.swing.JTextPane jTextPaneInfos;
     private javax.swing.JMenuItem loadProjectMenuItem;
     private javax.swing.JPanel mainPanel;

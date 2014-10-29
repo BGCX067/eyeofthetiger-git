@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -62,7 +63,19 @@ public class PDFDossardGenerator {
             public String toString() {
                 return "Date d'inscription";
             }
-        }
+        },
+        groupe {
+            @Override
+            public String toString() {
+                return "Groupe";
+            }
+        },           
+        renseignement {
+            @Override
+            public String toString() {
+                return "Renseignement";
+            }
+        }        
     }
     
     
@@ -194,7 +207,18 @@ public class PDFDossardGenerator {
             public int compare(Participant o1, Participant o2) {
                 if(o1 == o2) {return 0;}
                 if(o1 == null) {return 1;}
+                if(o1.equals(o2)) {return 0;}
                 if(o2 == null) {return -1;}
+                if(o1.getNom() == null 
+                    || (o1.getNom()).trim().isEmpty()
+                    && ("" + o1.getPrenom()).trim().isEmpty()) {
+                    return 1;
+                }
+                if(o2.getNom() == null 
+                    || (o2.getNom()).trim().isEmpty()
+                    && ("" + o2.getPrenom()).trim().isEmpty()) {
+                    return -1;
+                }
                 int i = ("" + o1.getNom()).compareToIgnoreCase(""+o2.getNom());
                 if( i == 0) {
                     i = ("" + o1.getPrenom()).compareToIgnoreCase(""+o2.getPrenom());
@@ -225,10 +249,50 @@ public class PDFDossardGenerator {
                         if(o1 == o2) {return 0;}
                         if(o1 == null || o1.getNumero() == null) {return 1;}
                         if(o2 == null || o2.getNumero() == null) {return -1;}
+                        if((""+o1.getNumero()).trim().isEmpty()) {
+                            return 1;
+                        }
+                        if((""+o2.getNumero()).trim().isEmpty()) {
+                            return -1;
+                        }                        
                         return ac.compare(o1.getNumero(), o2.getNumero());
                     }
                 };    
                 break;
+            case groupe:
+                    comparator = new Comparator<Participant>() {
+                    @Override
+                    public int compare(Participant o1, Participant o2) {
+                        if(o1 == o2) {return 0;}
+                        if(o1 == null || o1.getGroupe() == null) {return 1;}
+                        if(o2 == null || o2.getGroupe() == null) {return -1;}
+                        if(o1.getGroupe().trim().isEmpty()) {
+                            return 1;
+                        }  
+                        if(o2.getGroupe().trim().isEmpty()) {
+                            return -1;
+                        }  
+                        return o1.getGroupe().compareTo(o2.getGroupe());
+                    }
+                };
+                break;
+            case renseignement:
+                    comparator = new Comparator<Participant>() {
+                    @Override
+                    public int compare(Participant o1, Participant o2) {
+                        if(o1 == o2) {return 0;}
+                        if(o1 == null || o1.getRenseignements() == null) {return 1;}
+                        if(o2 == null || o2.getRenseignements() == null) {return -1;}
+                        if(o1.getRenseignements().trim().isEmpty()) {
+                            return 1;
+                        }  
+                        if(o2.getRenseignements().trim().isEmpty()) {
+                            return -1;
+                        }  
+                        return o1.getRenseignements().compareTo(o2.getRenseignements());
+                    }
+                };
+                break;                
         }
         Collections.sort(participants, comparator);
     }

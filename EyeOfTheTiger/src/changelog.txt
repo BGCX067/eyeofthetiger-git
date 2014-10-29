@@ -1,3 +1,9 @@
+Version du 2014/10/10
+* Ajouter la possibilité d'un logo pour les dossards et un texte fixe
+* Ajouter un "fond" sur les dossards
+*   Tris lors de l'export PDF des dossards
+
+
 Version du 2013/11/06
 * Correction de l'export PDF des dossards (réduit la police de caractères pour ne pas faire déborder les écritures de la page)
 * Possibliité d'ajouter deux logos aux dossards

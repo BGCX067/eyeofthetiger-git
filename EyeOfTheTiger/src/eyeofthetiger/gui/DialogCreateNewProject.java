@@ -69,7 +69,7 @@ public class DialogCreateNewProject extends javax.swing.JDialog {
             }
         });
         
-        String f = new File("").getAbsolutePath();
+        String f = Utils.GetMyDocumentsFolder().getAbsolutePath();
         jTextFieldFolder.setText(f);
         
         check();
@@ -300,6 +300,7 @@ public class DialogCreateNewProject extends javax.swing.JDialog {
 
 private void jButtonBrowseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonBrowseActionPerformed
     JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setCurrentDirectory(Utils.GetMyDocumentsFolder());
     fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     if(fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
         File folder = fileChooser.getSelectedFile();

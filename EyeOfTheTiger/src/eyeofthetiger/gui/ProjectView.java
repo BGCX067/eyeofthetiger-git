@@ -63,11 +63,12 @@ public class ProjectView extends javax.swing.JPanel {
             }           
         });
         menu.add(item);
-        item = new JMenuItem(new AbstractAction("Générer les dossard des participants sélectionné") {
+        item = new JMenuItem(new AbstractAction("Générer les dossards ...") {
             public void actionPerformed(ActionEvent e) {
                 exportDossardAction();
             } 
         });
+        menu.addSeparator();
         menu.add(item);
         jTableParticipants.setComponentPopupMenu(menu);
         
@@ -246,7 +247,7 @@ public void exportDossardAction() {
     if(project != null) {
         ExportDossard frame = new ExportDossard(project,getParticipantSelection());
         frame.setLocationByPlatform(true);
-        frame.setLocationRelativeTo(null);
+        frame.setLocationRelativeTo(this);
         frame.setVisible(true);
     }
 }

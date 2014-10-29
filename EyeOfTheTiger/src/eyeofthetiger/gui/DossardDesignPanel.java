@@ -18,9 +18,11 @@ import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileFilter;
 import org.joda.time.DateTime;
 
 /**
@@ -29,11 +31,16 @@ import org.joda.time.DateTime;
  */
 public class DossardDesignPanel extends javax.swing.JPanel {
 
+
     public DossardDesignPanel() {
         initComponents();
         
         jPanelImage.setLayout(new BorderLayout());
         jPanelImage.add(dip,BorderLayout.CENTER);
+        
+        ResourceBundle bundle = java.util.ResourceBundle.getBundle("eyeofthetiger/gui/resources/DossardDesignPanel");
+        Utils.BalloonHelp(bundle.getString("pdf_background_help"), jTextFieldBackgroundPdf, jButtonBackgroundPdfBrowse, jLabel5);
+        Utils.BalloonHelp(bundle.getString("pdf_logo_help"), jTextFieldLogoLeft, jTextFieldLogoRight, jButtonLogoLeft, jButtonLogoRight);
     }
 
     DossardImageDisplayPanel dip = new DossardImageDisplayPanel();
@@ -258,6 +265,7 @@ public class DossardDesignPanel extends javax.swing.JPanel {
 
         jLabel5.setText("PDF de fond:");
 
+        jTextFieldBackgroundPdf.setToolTipText("");
         jTextFieldBackgroundPdf.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextFieldBackgroundPdfActionPerformed(evt);
@@ -376,6 +384,9 @@ public class DossardDesignPanel extends javax.swing.JPanel {
 
     private void jButtonLogoLeftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLogoLeftActionPerformed
         JFileChooser chooser = new JFileChooser();
+        chooser.addChoosableFileFilter(Utils.IMAGE_FILE_FILTER);
+        chooser.setFileFilter(Utils.IMAGE_FILE_FILTER);  
+        chooser.setCurrentDirectory(Utils.GetMyDocumentsFolder());
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
            String filePath = chooser.getSelectedFile().getAbsolutePath();
@@ -389,6 +400,9 @@ public class DossardDesignPanel extends javax.swing.JPanel {
 
     private void jButtonLogoRightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLogoRightActionPerformed
         JFileChooser chooser = new JFileChooser();
+        chooser.addChoosableFileFilter(Utils.IMAGE_FILE_FILTER);
+        chooser.setFileFilter(Utils.IMAGE_FILE_FILTER);        
+        chooser.setCurrentDirectory(Utils.GetMyDocumentsFolder());
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
            String filePath = chooser.getSelectedFile().getAbsolutePath();
@@ -470,6 +484,10 @@ public class DossardDesignPanel extends javax.swing.JPanel {
 
     private void jButtonBackgroundPdfBrowseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonBackgroundPdfBrowseActionPerformed
         JFileChooser chooser = new JFileChooser();
+        chooser.addChoosableFileFilter(Utils.PDF_FILE_FILTER);
+        chooser.setFileFilter(Utils.PDF_FILE_FILTER);
+        
+        chooser.setCurrentDirectory(Utils.GetMyDocumentsFolder());
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
            String filePath = chooser.getSelectedFile().getAbsolutePath();

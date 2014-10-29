@@ -554,6 +554,7 @@ private void jButtonNouveauTopDepartActionPerformed(java.awt.event.ActionEvent e
     private void jButtonSaveXLSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSaveXLSActionPerformed
         try {
             JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setCurrentDirectory(eyeofthetiger.gui.Utils.GetMyDocumentsFolder());
             fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             fileChooser.setMultiSelectionEnabled(false);
             if(fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
