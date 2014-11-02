@@ -312,7 +312,18 @@ public void editCourse(Course c) {
     }   
 }
 
-
+public void exportCourse(Course c) throws Exception {
+    for(int i = 0; i < jTabbedPane1.getTabCount(); i++) {
+        Component tabC = jTabbedPane1.getComponentAt(i);
+        if(tabC instanceof CourseView) {
+            CourseView cv = (CourseView)tabC;
+            if(cv.getCourse() == c) {
+                cv.saveAsXLS();
+                break;
+            }
+        }
+    }    
+}
 
 private CourseView addCourseView(Course c) {
     CourseView view = new CourseView(c);

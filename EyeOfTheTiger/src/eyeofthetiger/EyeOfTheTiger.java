@@ -5,13 +5,7 @@
 package eyeofthetiger;
 
 import eyeofthetiger.utils.Utils;
-import java.util.Locale;
 import org.joda.time.Duration;
-import org.joda.time.Period;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.PeriodFormat;
-import org.joda.time.format.PeriodFormatter;
 
 /**
  *

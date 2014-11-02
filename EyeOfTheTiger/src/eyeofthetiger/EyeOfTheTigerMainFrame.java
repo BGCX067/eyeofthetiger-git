@@ -52,6 +52,7 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
         });
 
         saveTimer = new Timer(2000, new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 doSave(true);
             }
@@ -114,6 +115,8 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
         jMenuCourses = new javax.swing.JMenu();
         jMenuItemNouvelleCourse = new javax.swing.JMenuItem();
         jSeparator6 = new javax.swing.JPopupMenu.Separator();
+        jMenuExportCourse = new javax.swing.JMenu();
+        jSeparator7 = new javax.swing.JPopupMenu.Separator();
         jMenuEditCourse = new javax.swing.JMenu();
         jSeparator5 = new javax.swing.JPopupMenu.Separator();
         jMenuDeleteCourse = new javax.swing.JMenu();
@@ -258,7 +261,11 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
         jMenuCourses.add(jMenuItemNouvelleCourse);
         jMenuCourses.add(jSeparator6);
 
-        jMenuEditCourse.setText("Modifier les participants");
+        jMenuExportCourse.setText("Export XLS des résultats ...");
+        jMenuCourses.add(jMenuExportCourse);
+        jMenuCourses.add(jSeparator7);
+
+        jMenuEditCourse.setText("Modifier les participants ...");
         jMenuCourses.add(jMenuEditCourse);
         jMenuCourses.add(jSeparator5);
 
@@ -567,6 +574,7 @@ public class EyeOfTheTigerMainFrame extends javax.swing.JFrame {
     }
  
 private void manageCourseMenuItems() {
+    jMenuExportCourse.removeAll();
     jMenuDeleteCourse.removeAll();
     jMenuEditCourse.removeAll();
     
@@ -581,6 +589,7 @@ private void manageCourseMenuItems() {
     if(currectProject != null && currectProject.getCourse().size() >0) {
         jMenuDeleteCourse.setEnabled(true);
         jMenuEditCourse.setEnabled(true);
+        jMenuExportCourse.setEnabled(true);
         for(final Course c : currectProject.getCourse()) {
             JMenuItem itemDelete = new JMenuItem(new AbstractAction(c.getName()) {
                     @Override
@@ -604,6 +613,7 @@ private void manageCourseMenuItems() {
             jMenuDeleteCourse.insert(itemDelete, 0);
             
             JMenuItem itemEdit = new JMenuItem(new AbstractAction(c.getName()) {
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         try {
                             if(currectProjectView != null) {
@@ -615,12 +625,28 @@ private void manageCourseMenuItems() {
                         }
                     }
                 });
-            jMenuEditCourse.insert(itemEdit, 0);            
+            jMenuEditCourse.insert(itemEdit, 0);    
+            
+            JMenuItem itemExport = new JMenuItem(new AbstractAction(c.getName()) {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            if(currectProjectView != null) {
+                                currectProjectView.exportCourse(c);
+                            }
+                        }
+                        catch(Exception ex) {
+                            JOptionPane.showMessageDialog(EyeOfTheTigerMainFrame.this,"Erreur lors de l'export de la course '" + c.getName() + "': " +ex.getMessage() ,"Erreur",JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                });
+            jMenuExportCourse.insert(itemExport, 0);            
         }
     }
     else {
         jMenuDeleteCourse.setEnabled(false);
         jMenuEditCourse.setEnabled(false);
+        jMenuExportCourse.setEnabled(false);
     }
 }    
    
@@ -670,7 +696,7 @@ private void manageCourseMenuItems() {
          * Create and display the form
          */
         java.awt.EventQueue.invokeLater(new Runnable() {
-
+            @Override
             public void run() {
                 EyeOfTheTigerMainFrame eottmf = new EyeOfTheTigerMainFrame();
                 boolean debug = false;
@@ -698,6 +724,7 @@ private void manageCourseMenuItems() {
     private javax.swing.JMenu jMenuCourses;
     private javax.swing.JMenu jMenuDeleteCourse;
     private javax.swing.JMenu jMenuEditCourse;
+    private javax.swing.JMenu jMenuExportCourse;
     private javax.swing.JMenuItem jMenuItemGenerateDossard;
     private javax.swing.JMenuItem jMenuItemNouvelleCourse;
     private javax.swing.JMenuItem jMenuItemOptionsDossards;
@@ -708,6 +735,7 @@ private void manageCourseMenuItems() {
     private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JPopupMenu.Separator jSeparator5;
     private javax.swing.JPopupMenu.Separator jSeparator6;
+    private javax.swing.JPopupMenu.Separator jSeparator7;
     private javax.swing.JTextPane jTextPaneInfos;
     private javax.swing.JMenuItem loadProjectMenuItem;
     private javax.swing.JPanel mainPanel;

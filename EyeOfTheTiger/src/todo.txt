@@ -10,7 +10,8 @@
 + Centrer les fenètres d'options
 + Tris des participants par groupe et renseignements
 + Tris des participants (+ tris des dossards): mettre les "blancs" (participants null) à la fin
-- L'export XLS des course affiche parfois "01:3:30"
++ Export XLS des courses depuis un menu
++ L'export XLS des course affiche parfois "01:3:30" -> En fait il est probablement passé par le fichier .CSV
 - Ajouter de la documentation
 - Ajouter des "balloontooltip"
-- Export XLS des courses depuis un menu
+

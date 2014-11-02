@@ -80,9 +80,16 @@
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator6">
             </MenuItem>
+            <Menu class="javax.swing.JMenu" name="jMenuExportCourse">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Export XLS des r&#xe9;sultats ..."/>
+              </Properties>
+            </Menu>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator7">
+            </MenuItem>
             <Menu class="javax.swing.JMenu" name="jMenuEditCourse">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Modifier les participants"/>
+                <Property name="text" type="java.lang.String" value="Modifier les participants ..."/>
               </Properties>
             </Menu>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator5">

@@ -27,6 +27,7 @@ import java.util.ResourceBundle;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
@@ -553,17 +554,7 @@ private void jButtonNouveauTopDepartActionPerformed(java.awt.event.ActionEvent e
 
     private void jButtonSaveXLSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSaveXLSActionPerformed
         try {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setCurrentDirectory(eyeofthetiger.gui.Utils.GetMyDocumentsFolder());
-            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-            fileChooser.setMultiSelectionEnabled(false);
-            if(fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-                File file = fileChooser.getSelectedFile();
-                if(!file.getName().toLowerCase().endsWith(".xls")) {
-                    file = new File(file.getParentFile(),file.getName()+".xls");
-                }
-                exportAsXLS(file);        
-            }
+            saveAsXLS();
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -585,6 +576,20 @@ private void jButtonNouveauTopDepartActionPerformed(java.awt.event.ActionEvent e
 
 
 
+    public void saveAsXLS() throws Exception {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(eyeofthetiger.gui.Utils.GetMyDocumentsFolder());
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setMultiSelectionEnabled(false);
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Fichier Excel", "xls","XLS"));
+        if(fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            if(!file.getName().toLowerCase().endsWith(".xls")) {
+                file = new File(file.getParentFile(),file.getName()+".xls");
+            }
+            exportAsXLS(file);        
+        }
+    }
 
     private void exportAsXLS(File outputFile) throws Exception {
         Workbook wb = new HSSFWorkbook();
